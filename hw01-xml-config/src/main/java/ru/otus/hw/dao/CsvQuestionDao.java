@@ -20,4 +20,29 @@ public class CsvQuestionDao implements QuestionDao {
 
         return new ArrayList<>();
     }
+
+    private CSVReader buildCSVReader(Reader reader, char separator, boolean ignoreQuotations, int skipLinesCount) {
+
+        return new CSVReaderBuilder(reader)
+            .withSkipLines(skipLinesCount)
+            .withCSVParser(new CSVParserBuilder()
+                .withSeparator(separator)
+                .withIgnoreQuotations(ignoreQuotations)
+                .build())
+            .build();
+    }
+
+    private Reader openResourceReader(String resourceName) throws IOException {
+        InputStream is = Thread.currentThread()
+            .getContextClassLoader()
+            .getResourceAsStream(resourceName);
+
+        if (is == null) {
+            throw new FileNotFoundException(
+                "Resource not found in classpath: " + resourceName +
+                    ". Put the file under src/main/resources and pass just the resource name (e.g., 'questions.csv')."
+            );
+        }
+        return new InputStreamReader(is, StandardCharsets.UTF_8);
+    }
 }
