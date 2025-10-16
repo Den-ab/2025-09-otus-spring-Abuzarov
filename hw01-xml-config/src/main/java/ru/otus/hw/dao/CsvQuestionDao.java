@@ -1,9 +1,22 @@
 package ru.otus.hw.dao;
 
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.config.TestFileNameProvider;
+import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
+import ru.otus.hw.exceptions.QuestionReadException;
+import ru.otus.hw.service.IOService;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,12 +24,28 @@ import java.util.List;
 public class CsvQuestionDao implements QuestionDao {
     private final TestFileNameProvider fileNameProvider;
 
+    private final IOService ioService;
+
     @Override
     public List<Question> findAll() {
-        // Использовать CsvToBean
-        // https://opencsv.sourceforge.net/#collection_based_bean_fields_one_to_many_mappings
-        // Использовать QuestionReadException
-        // Про ресурсы: https://mkyong.com/java/java-read-a-file-from-resources-folder/
+        final String questionsFileName = this.fileNameProvider.getTestFileName();
+
+        try (Reader reader = this.openResourceReader(questionsFileName)) {
+            CSVReader csvReader = this.buildCSVReader(reader, ';', false, 1);
+            List<QuestionDto> questionDtos = new CsvToBeanBuilder<QuestionDto>(csvReader)
+                .withType(QuestionDto.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build()
+                .parse();
+
+            return questionDtos.stream()
+                .map(QuestionDto::toDomainObject)
+                .toList();
+        } catch (IOException e) {
+            this.ioService.printFormattedLine("Couldn't find the questions.");
+        } catch (RuntimeException e) {
+            throw new QuestionReadException("CSV parse error: " + e.getMessage(), e);
+        }
 
         return new ArrayList<>();
     }
