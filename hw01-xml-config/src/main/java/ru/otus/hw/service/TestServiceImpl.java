@@ -18,7 +18,6 @@ public class TestServiceImpl implements TestService {
     public void executeTest() {
         ioService.printLine("");
         ioService.printFormattedLine("Please answer the questions below%n");
-        // Получить вопросы из дао и вывести их с вариантами ответов
         final List<Question> questions = questionDao.findAll();
         questions.forEach((Question question) -> {
 
@@ -27,6 +26,5 @@ public class TestServiceImpl implements TestService {
             question.answers().stream().map(Answer::text).forEach(ioService::printLine);
             ioService.printLine("");
         });
-
     }
 }

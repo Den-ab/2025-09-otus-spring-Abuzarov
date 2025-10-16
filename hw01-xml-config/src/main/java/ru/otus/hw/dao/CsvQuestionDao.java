@@ -29,7 +29,6 @@ public class CsvQuestionDao implements QuestionDao {
     @Override
     public List<Question> findAll() {
         final String questionsFileName = this.fileNameProvider.getTestFileName();
-
         try (Reader reader = this.openResourceReader(questionsFileName)) {
             CSVReader csvReader = this.buildCSVReader(reader, ';', false, 1);
             List<QuestionDto> questionDtos = new CsvToBeanBuilder<QuestionDto>(csvReader)
