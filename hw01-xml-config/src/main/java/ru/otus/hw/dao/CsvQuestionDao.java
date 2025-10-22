@@ -5,6 +5,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
@@ -13,7 +14,6 @@ import ru.otus.hw.service.IOService;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -50,7 +50,6 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     private CSVReader buildCSVReader(Reader reader, char separator, boolean ignoreQuotations, int skipLinesCount) {
-
         return new CSVReaderBuilder(reader)
             .withSkipLines(skipLinesCount)
             .withCSVParser(new CSVParserBuilder()
@@ -61,16 +60,14 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     private Reader openResourceReader(String resourceName) throws IOException {
-        InputStream is = Thread.currentThread()
-            .getContextClassLoader()
-            .getResourceAsStream(resourceName);
+        var resource = new ClassPathResource(resourceName);
 
-        if (is == null) {
+        if (!resource.exists()) {
             throw new FileNotFoundException(
                 "Resource not found in classpath: " + resourceName +
                     ". Put the file under src/main/resources and pass just the resource name (e.g., 'questions.csv')."
             );
         }
-        return new InputStreamReader(is, StandardCharsets.UTF_8);
+        return new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
     }
 }
