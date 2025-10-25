@@ -16,19 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class CsvQuestionDAOTest {
+
+    @Mock
     private TestFileNameProvider fileNameProvider;
 
-    private IOService ioService;
-
-    private QuestionDao questionDao;
-
-    @BeforeEach
-    void setUp() {
-        fileNameProvider = mock(TestFileNameProvider.class);
-        ioService = new StreamsIOService(System.out);
-        questionDao = new CsvQuestionDao(fileNameProvider, ioService);
-    }
+    @InjectMocks
+    private CsvQuestionDao questionDao;
 
     @DisplayName("Not empty question list")
     @Test
