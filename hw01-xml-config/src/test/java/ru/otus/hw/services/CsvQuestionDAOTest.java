@@ -1,19 +1,19 @@
 package ru.otus.hw.services;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.CsvQuestionDao;
-import ru.otus.hw.dao.QuestionDao;
+import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
-import ru.otus.hw.service.IOService;
-import ru.otus.hw.service.StreamsIOService;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,11 +25,31 @@ class CsvQuestionDAOTest {
     @InjectMocks
     private CsvQuestionDao questionDao;
 
-    @DisplayName("Not empty question list")
+    @DisplayName("Not empty and valid question list")
     @Test
-    void test1() {
-        when(this.fileNameProvider.getTestFileName()).thenReturn("questions.csv");
+    void findAll_validFileName_questionsLoaded() {
+        when(this.fileNameProvider.getTestFileName()).thenReturn("questions-test.csv");
         final List<Question> foundQuestions = this.questionDao.findAll();
-        assertThat(foundQuestions).isNotEmpty();
+
+        assertThat(foundQuestions)
+            .hasSize(2)
+            .extracting(Question::text)
+            .containsExactly("Question1", "Question2");
+
+        assertThat(foundQuestions.get(0).answers())
+            .extracting(Answer::text)
+            .containsExactly("Answer1-1", "Answer1-2", "Answer1-3");
+
+        assertThat(foundQuestions.get(1).answers())
+            .extracting(Answer::text)
+            .containsExactly("Answer2-1", "Answer2-2", "Answer2-3");
+
+        assertThat(foundQuestions.get(0).answers())
+            .extracting(Answer::isCorrect)
+            .containsExactly(true, false, false);
+
+        assertThat(foundQuestions.get(1).answers())
+            .extracting(Answer::isCorrect)
+            .containsExactly(false, false, true);
     }
 }
