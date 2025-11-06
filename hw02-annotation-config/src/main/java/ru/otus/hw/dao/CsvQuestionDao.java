@@ -6,7 +6,8 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
-import ru.otus.hw.config.TestFileNameProvider;
+import org.springframework.stereotype.Repository;
+import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
@@ -21,14 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Repository
 public class CsvQuestionDao implements QuestionDao {
-    private final TestFileNameProvider fileNameProvider;
+    private final AppProperties appProperties;
 
     private final IOService ioService;
 
     @Override
     public List<Question> findAll() {
-        final String questionsFileName = this.fileNameProvider.getTestFileName();
+        final String questionsFileName = this.appProperties.getTestFileName();
         try (Reader reader = this.openResourceReader(questionsFileName)) {
             CSVReader csvReader = this.buildCSVReader(reader, ';', false, 1);
             List<QuestionDto> questionDtos = new CsvToBeanBuilder<QuestionDto>(csvReader)
