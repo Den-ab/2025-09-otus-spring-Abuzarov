@@ -31,13 +31,14 @@ public class TestServiceImpl implements TestService {
             IntStream.range(0, answers.size()).forEach(index -> {
                 ioService.printLine(String.format("%s. %s", index + 1, answers.get(index).text()));
             });
-            var studentAnswer = ioService.readStringWithPrompt("\nPlease input correct option number").trim();
-            var isAnswerValid = false;
-
-            if (studentAnswer.matches("[1-9]")) {
-                final int index = Integer.parseInt(studentAnswer) - 1;
-                isAnswerValid = index < answers.size() && answers.get(index).isCorrect();
-            }
+            var studentAnswer = ioService.readIntForRangeWithPrompt(
+                1,
+                answers.size(),
+                "\nPlease input correct option number",
+                "Incorrect option number"
+            );
+            final int index = studentAnswer - 1;
+            var isAnswerValid = index < answers.size() && answers.get(index).isCorrect();
 
             testResult.applyAnswer(question, isAnswerValid);
         }
