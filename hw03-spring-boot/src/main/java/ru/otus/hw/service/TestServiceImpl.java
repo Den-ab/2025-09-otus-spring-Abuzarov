@@ -33,11 +33,10 @@ public class TestServiceImpl implements TestService {
             IntStream.range(0, answers.size()).forEach(index -> {
                 ioService.printLine(String.format("%s. %s", index + 1, answers.get(index).text()));
             });
-            var studentAnswer = ioService.readIntForRangeWithPrompt(
+            var studentAnswer = ioService.readIntForRangeLocalized(
                 1,
                 answers.size(),
-                "\nPlease input correct option number",
-                "Incorrect option number"
+                "TestService.answer.the.questions.range.error"
             );
             final int index = studentAnswer - 1;
             var isAnswerValid = index < answers.size() && answers.get(index).isCorrect();
