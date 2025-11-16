@@ -24,7 +24,20 @@ public class TestServiceImpl implements TestService {
         var testResult = new TestResult(student);
 
         for (var question: questions) {
-            var isAnswerValid = false; // Задать вопрос, получить ответ
+            ioService.printLine("\n" + question.text());
+            final List<Answer> answers = question.answers();
+            IntStream.range(0, answers.size()).forEach(index -> {
+                ioService.printLine(String.format("%s. %s", index + 1, answers.get(index).text()));
+            });
+            var studentAnswer = ioService.readIntForRangeWithPrompt(
+                1,
+                answers.size(),
+                "\nPlease input correct option number",
+                "Incorrect option number"
+            );
+            final int index = studentAnswer - 1;
+            var isAnswerValid = index < answers.size() && answers.get(index).isCorrect();
+
             testResult.applyAnswer(question, isAnswerValid);
         }
         return testResult;
