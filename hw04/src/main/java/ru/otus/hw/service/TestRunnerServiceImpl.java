@@ -1,10 +1,13 @@
 package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@ShellComponent
 public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final TestService testService;
@@ -18,5 +21,10 @@ public class TestRunnerServiceImpl implements TestRunnerService {
         var student = studentService.determineCurrentStudent();
         var testResult = testService.executeTestFor(student);
         resultService.showResult(testResult);
+    }
+
+    @ShellMethod("start")
+    public void shellRun() {
+
     }
 }
