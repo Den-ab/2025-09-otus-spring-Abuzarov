@@ -2,10 +2,9 @@ package ru.otus.hw.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ActiveProfiles;
 import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.CsvQuestionDao;
@@ -17,7 +16,8 @@ import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
+@ActiveProfiles("test")
+@SpringBootTest
 class CsvQuestionDAOIntegrationTest {
 
     @Autowired
@@ -33,7 +33,7 @@ class CsvQuestionDAOIntegrationTest {
     @Test
     void getTestFileName_validFileName() {
 
-        if (this.appProperties.getLocale().equals(Locale.ENGLISH)) {
+        if (this.appProperties.getLocale().equals(Locale.US)) {
 
             assertThat(this.fileNameProvider.getTestFileName()).isEqualTo("questions.csv");
         }
