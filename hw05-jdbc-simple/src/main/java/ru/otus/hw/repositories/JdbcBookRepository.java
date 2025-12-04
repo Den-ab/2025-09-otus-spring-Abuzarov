@@ -1,5 +1,6 @@
 package ru.otus.hw.repositories;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -32,12 +33,20 @@ public class JdbcBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        final Book book = this.namedParameterJdbcOperations.queryForObject(
-            "SELECT id, title FROM books WHERE id = :id",
-            Map.of("id", id),
-            new BookRowMapper()
-        );
-        return Optional.of(book);
+        try {
+            final Book book = this.namedParameterJdbcOperations.queryForObject(
+                "SELECT b.id, b.title, b.author_id, b.genre_id, a.full_name AS author_full_name, g.name AS genre_name "
+                    + "FROM books b "
+                    + "LEFT JOIN authors a ON a.id = b.author_id "
+                    + "LEFT JOIN genres g ON g.id = b.genre_id "
+                    + "WHERE b.id = :id ",
+                Map.of("id", id),
+                new BookRowMapper()
+            );
+            return Optional.of(book);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -61,9 +70,7 @@ public class JdbcBookRepository implements BookRepository {
 
     @Override
     public void deleteById(long id) {
-        final Map<String, Object> queryParams = new HashMap<>(1);
-        queryParams.put("id", id);
-        this.namedParameterJdbcOperations.update("DELETE FROM books WHERE id = :id", queryParams);
+        this.namedParameterJdbcOperations.update("DELETE FROM books WHERE id = :id", Map.of("id", id));
     }
 
     private Book insert(Book book) {
