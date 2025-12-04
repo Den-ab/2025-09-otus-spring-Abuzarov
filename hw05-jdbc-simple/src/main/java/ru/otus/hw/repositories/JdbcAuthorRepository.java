@@ -8,7 +8,6 @@ import ru.otus.hw.models.Author;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,12 +31,9 @@ public class JdbcAuthorRepository implements AuthorRepository {
 
     @Override
     public Optional<Author> findById(long id) {
-
-        final Map<String, Object> queryParams = new HashMap<>(1);
-        queryParams.put("id", id);
         final Author author = this.namedParameterJdbcOperations.queryForObject(
             "SELECT id, full_name FROM authors WHERE id = :id",
-            queryParams,
+            Map.of("id", id),
             new AuthorRowMapper()
         );
         return Optional.of(author);
