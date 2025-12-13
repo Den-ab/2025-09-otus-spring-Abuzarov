@@ -11,28 +11,19 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class AuthorRepositoryJpa implements AuthorRepository {
+public class AuthorJpaRepository implements AuthorRepository {
 
     private final EntityManager entityManager;
 
     @Override
     public List<Author> findAll() {
-
         final TypedQuery<Author> query = this.entityManager.createQuery("select a from Author a", Author.class);
-
         return query.getResultList();
     }
 
     @Override
     public Optional<Author> findById(long id) {
-
-        final TypedQuery<Author> query = this.entityManager.createQuery(
-            "select a from Author a where id = :id",
-            Author.class
-        );
-
-        query.setParameter("id", id);
-
-        return Optional.ofNullable(query.getSingleResult());
+        final Author author = this.entityManager.find(Author.class, id);
+        return Optional.ofNullable(author);
     }
 }
