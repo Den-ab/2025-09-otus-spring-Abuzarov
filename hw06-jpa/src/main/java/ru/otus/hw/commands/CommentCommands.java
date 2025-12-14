@@ -24,7 +24,7 @@ public class CommentCommands {
                 .orElse("Comment with id %d not found".formatted(id));
     }
 
-    @ShellMethod(value = "Find comment by id", key = "cbbid")
+    @ShellMethod(value = "Find comment by book id", key = "cbbid")
     public String findCommentByBookId(long bookId) {
         return commentService.findByBookId(bookId).stream()
             .map(commentConverter::commentToString)

@@ -1,5 +1,6 @@
 package ru.otus.hw.repositories;
 
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -26,6 +27,9 @@ public class BookJpaRepository implements BookRepository {
     @Override
     public List<Book> findAll() {
         final TypedQuery<Book> query = this.entityManager.createQuery("select b from Book b", Book.class);
+
+        EntityGraph<?> entityGraph = this.entityManager.getEntityGraph("book-with-authors-and-genres-graph");
+        query.setHint("javax.persistence.fetchgraph", entityGraph);
 
         return query.getResultList();
     }
