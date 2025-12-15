@@ -12,7 +12,9 @@ import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -23,11 +25,16 @@ import lombok.NoArgsConstructor;
     name = "book-with-authors-and-genres-graph",
     attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre")}
 )
+@ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Long id;
 
+    @ToString.Include
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)
