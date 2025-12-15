@@ -14,7 +14,7 @@ import ru.otus.hw.models.Genre;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @DataJpaTest
 @Import({BookJpaRepository.class, AuthorJpaRepository.class, GenreJpaRepository.class, CommentJpaRepository.class})
@@ -123,7 +123,7 @@ public class RepositoriesCommonTest {
         assertThat(actual.get().getContent()).isEqualTo(fromDb.getContent());
 
         final List<Comment> byBookId = this.commentRepository.findByBookId(book.getId());
-        assertThat(byBookId).isNotNull();
+        assertThat(byBookId).isNotEmpty();
     }
 
     @Test
