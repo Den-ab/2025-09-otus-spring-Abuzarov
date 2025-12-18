@@ -3,6 +3,8 @@ package ru.otus.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.converters.BookConverter;
+import ru.otus.hw.dto.BookDTO;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
@@ -11,6 +13,7 @@ import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -21,26 +24,30 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    @Override
-    public Optional<Book> findById(long id) {
-        return bookRepository.findById(id);
-    }
+    private final BookConverter bookConverter;
 
+    @Transactional
     @Override
-    public List<Book> findAll() {
-        return bookRepository.findAll();
+    public Optional<BookDTO> findById(long id) {
+        return bookRepository.findById(id).map(this.bookConverter::convertToDTO);
     }
 
     @Transactional
     @Override
-    public Book insert(String title, long authorId, long genreId) {
-        return save(null, title, authorId, genreId);
+    public List<BookDTO> findAll() {
+        return bookRepository.findAll().stream().map(this.bookConverter::convertToDTO).collect(Collectors.toList());
     }
 
     @Transactional
     @Override
-    public Book update(long id, String title, long authorId, long genreId) {
-        return save(id, title, authorId, genreId);
+    public BookDTO insert(String title, long authorId, long genreId) {
+        return this.bookConverter.convertToDTO(save(null, title, authorId, genreId));
+    }
+
+    @Transactional
+    @Override
+    public BookDTO update(long id, String title, long authorId, long genreId) {
+        return this.bookConverter.convertToDTO(save(id, title, authorId, genreId));
     }
 
     @Transactional
