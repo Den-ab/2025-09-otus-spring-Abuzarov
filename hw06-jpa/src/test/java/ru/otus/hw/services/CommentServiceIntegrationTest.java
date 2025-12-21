@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.otus.hw.dto.BookDTO;
+import ru.otus.hw.dto.CommentDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,40 +16,57 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 public class CommentServiceIntegrationTest {
 
     @Autowired
-    private BookService bookService;
+    private CommentService commentService;
 
     @Test
-    @DisplayName("Проверка того что список книг не пустой.")
-    void shouldFindAnyBook() {
-        final List<BookDTO> allBooks = this.bookService.findAll();
-        assertThat(allBooks).isNotEmpty();
+    @DisplayName("Проверка создания коммента.")
+    void shouldCreateComment() {
+
+        final long bookId = 1;
+        final CommentDTO commentToCreate = this.commentService.insert("Test_comment_1", bookId);
+        final Optional<CommentDTO> createdComment = this.commentService.findById(commentToCreate.id());
+        assertThat(createdComment).isNotEmpty();
+        assertThat(createdComment.get().content()).isEqualTo("Test_comment_1");
+        assertThat(createdComment.get().book().id()).isEqualTo(bookId);
+
+        this.commentService.insert("Test_comment_2", bookId);
+        final List<CommentDTO> commentsByBookId = this.commentService.findByBookId(bookId);
+        assertThat(commentsByBookId).hasSize(2);
     }
 
     @Test
-    @DisplayName("Проверка CRUD операций для книг.")
-    void shouldCreateReadUpdateDeleteBook() {
+    @DisplayName("Проверка обновления коммента.")
+    void shouldUpdateComment() {
 
-        final BookDTO bookToCreate = this.bookService.insert("Test_book_1", 2, 2);
-        final Optional<BookDTO> createdBook = this.bookService.findById(bookToCreate.id());
-        assertThat(createdBook).isNotEmpty();
-        assertThat(createdBook.get().title()).isEqualTo("Test_book_1");
-        assertThat(createdBook.get().author().id()).isEqualTo(2);
-        assertThat(createdBook.get().genre().id()).isEqualTo(2);
-        final BookDTO bookToUpdate = this.bookService.update(createdBook.get().id(), "Test_book_1_edited", 3, 3);
-        final Optional<BookDTO> updatedBook = this.bookService.findById(bookToUpdate.id());
-        assertThat(updatedBook).isNotEmpty();
-        assertThat(updatedBook.get().title()).isEqualTo("Test_book_1_edited");
-        assertThat(updatedBook.get().author().id()).isEqualTo(3);
-        assertThat(updatedBook.get().genre().id()).isEqualTo(3);
-        this.bookService.deleteById(updatedBook.get().id());
-        final Optional<BookDTO> deletedBook = this.bookService.findById(updatedBook.get().id());
-        assertThat(deletedBook).isEmpty();
+        final long bookId = 1;
+        final CommentDTO commentToCreate = this.commentService.insert("Test_comment_1", bookId);
+        final Optional<CommentDTO> createdComment = this.commentService.findById(commentToCreate.id());
+        assertThat(createdComment).isNotEmpty();
+        final CommentDTO commentToUpdate = this.commentService.update(createdComment.get().id(), "Edit_comment_1", 2);
+        final Optional<CommentDTO> updatedComment = this.commentService.findById(commentToUpdate.id());
+        assertThat(updatedComment).isNotEmpty();
+        assertThat(updatedComment.get().content()).isEqualTo("Edit_comment_1");
+        assertThat(updatedComment.get().book().id()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Проверка удаления коммента.")
+    void shouldDeleteComment() {
+
+        final long bookId = 1;
+        final CommentDTO commentToCreate = this.commentService.insert("Test_comment_1", bookId);
+        final Optional<CommentDTO> createdComment = this.commentService.findById(commentToCreate.id());
+        assertThat(createdComment).isNotEmpty();
+        this.commentService.deleteById(createdComment.get().id());
+        final Optional<CommentDTO> deletedComment = this.commentService.findById(createdComment.get().id());
+        assertThat(deletedComment).isEmpty();
     }
 
     @Test
     @DisplayName("Проверка на отсутствие ошибок ленивой загрузки.")
     void doesntThrowLazyInitializationException() {
-
-        assertThatCode(() -> this.bookService.findById(1)).doesNotThrowAnyException();
+        final long bookId = 1;
+        final CommentDTO commentToCreate = this.commentService.insert("Test_comment_1", bookId);
+        assertThatCode(() -> this.commentService.findById(commentToCreate.id())).doesNotThrowAnyException();
     }
 }
