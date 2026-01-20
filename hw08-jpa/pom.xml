@@ -10,9 +10,9 @@
     </parent>
 
     <groupId>ru.otus.hw</groupId>
-    <artifactId>hw07</artifactId>
+    <artifactId>hw08</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-data-jpa-hw</name>
+    <name>spring-data-mongodb</name>
 
     <properties>
         <java.version>17</java.version>
