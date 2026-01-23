@@ -7,12 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.CommentConverter;
 import ru.otus.hw.dto.CommentDTO;
 import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,9 +34,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public List<CommentDTO> findByBookId(ObjectId id) {
-        final Optional<Book> book = bookRepository.findById(id);
-        final List<ObjectId> commentIds = book.map(Book::getComments).orElseGet(ArrayList::new);
-        return commentRepository.findAllById(commentIds).stream()
+        return commentRepository.findCommentsByBookId(id).stream()
             .map(this.commentConverter::convertToDTO)
             .collect(Collectors.toList());
     }

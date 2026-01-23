@@ -9,11 +9,9 @@ import ru.otus.hw.dto.BookDTO;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
-import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
-import ru.otus.hw.repositories.CommentRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
 import java.util.List;
@@ -29,8 +27,6 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    private final CommentRepository commentRepository;
-
     private final BookConverter bookConverter;
 
     @Transactional
@@ -44,8 +40,7 @@ public class BookServiceImpl implements BookService {
                 final Genre genre = genreRepository.findById(book.getGenreId()).orElseThrow(() ->
                     new EntityNotFoundException("Genre with id %s not found".formatted(book.getGenreId()))
                 );
-                final List<Comment> comments = commentRepository.findAllById(book.getComments());
-                return this.bookConverter.convertToDTO(book, author, genre, comments);
+                return this.bookConverter.convertToDTO(book, author, genre);
             });
     }
 
@@ -60,8 +55,7 @@ public class BookServiceImpl implements BookService {
                 final Genre genre = genreRepository.findById(book.getGenreId()).orElseThrow(() ->
                     new EntityNotFoundException("Genre with id %s not found".formatted(book.getGenreId()))
                 );
-                final List<Comment> comments = commentRepository.findAllById(book.getComments());
-                return this.bookConverter.convertToDTO(book, author, genre, comments);
+                return this.bookConverter.convertToDTO(book, author, genre);
             })
             .collect(Collectors.toList());
     }
@@ -76,7 +70,7 @@ public class BookServiceImpl implements BookService {
             new EntityNotFoundException("Genre with id %s not found".formatted(genreId))
         );
         final Book savedBook = save(null, title, authorId, genreId);
-        return this.bookConverter.convertToDTO(savedBook, author, genre, List.of());
+        return this.bookConverter.convertToDTO(savedBook, author, genre);
     }
 
     @Transactional
@@ -90,9 +84,8 @@ public class BookServiceImpl implements BookService {
             new EntityNotFoundException("Genre with id %s not found".formatted(genreId))
         );
         final Book updatedBook = save(id, title, authorId, genreId);
-        final List<Comment> comments = commentRepository.findAllById(updatedBook.getComments());
 
-        return this.bookConverter.convertToDTO(updatedBook, author, genre, comments);
+        return this.bookConverter.convertToDTO(updatedBook, author, genre);
     }
 
     @Transactional
