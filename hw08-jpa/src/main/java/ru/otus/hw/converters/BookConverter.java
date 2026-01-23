@@ -3,7 +3,13 @@ package ru.otus.hw.converters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.otus.hw.dto.BookDTO;
+import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
+import ru.otus.hw.models.Genre;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -12,8 +18,10 @@ public class BookConverter {
 
     private final GenreConverter genreConverter;
 
+    private final CommentConverter commentConverter;
+
     public String bookToString(BookDTO book) {
-        return "Id: %d, title: %s, author: {%s}, genres: [%s]".formatted(
+        return "Id: %s, title: %s, author: {%s}, genres: [%s]".formatted(
             book.id(),
             book.title(),
             authorConverter.authorToString(book.author()),
@@ -21,13 +29,14 @@ public class BookConverter {
         );
     }
 
-    public BookDTO convertToDTO(Book book) {
+    public BookDTO convertToDTO(Book book, Author author, Genre genre, List<Comment> comments) {
 
         return new BookDTO(
-            book.getId(),
+            book.getId().toString(),
             book.getTitle(),
-            this.authorConverter.convertToDTO(book.getAuthor()),
-            this.genreConverter.convertToDTO(book.getGenre())
+            this.authorConverter.convertToDTO(author),
+            this.genreConverter.convertToDTO(genre),
+            comments.stream().map(commentConverter::convertToDTO).collect(Collectors.toList())
         );
     }
 }
