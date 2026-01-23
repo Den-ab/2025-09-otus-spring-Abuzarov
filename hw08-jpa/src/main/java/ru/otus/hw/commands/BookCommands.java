@@ -1,6 +1,7 @@
 package ru.otus.hw.commands;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import ru.otus.hw.converters.BookConverter;
@@ -25,29 +26,29 @@ public class BookCommands {
     }
 
     @ShellMethod(value = "Find book by id", key = "bbid")
-    public String findBookById(long id) {
-        return bookService.findById(id)
+    public String findBookById(String id) {
+        return bookService.findById(new ObjectId(id))
                 .map(bookConverter::bookToString)
-                .orElse("Book with id %d not found".formatted(id));
+                .orElse("Book with id %s not found".formatted(id));
     }
 
     // bins newBook 1 1
     @ShellMethod(value = "Insert book", key = "bins")
-    public String insertBook(String title, long authorId, long genreId) {
-        var savedBook = bookService.insert(title, authorId, genreId);
+    public String insertBook(String title, String authorId, String genreId) {
+        var savedBook = bookService.insert(title, new ObjectId(authorId), new ObjectId(genreId));
         return bookConverter.bookToString(savedBook);
     }
 
     // bupd 4 editedBook 3 2
     @ShellMethod(value = "Update book", key = "bupd")
-    public String updateBook(long id, String title, long authorId, long genreId) {
-        var savedBook = bookService.update(id, title, authorId, genreId);
+    public String updateBook(String id, String title, String authorId, String genreId) {
+        var savedBook = bookService.update(new ObjectId(id), title, new ObjectId(authorId), new ObjectId(genreId));
         return bookConverter.bookToString(savedBook);
     }
 
     // bdel 4
     @ShellMethod(value = "Delete book by id", key = "bdel")
-    public void deleteBook(long id) {
-        bookService.deleteById(id);
+    public void deleteBook(String id) {
+        bookService.deleteById(new ObjectId(id));
     }
 }
