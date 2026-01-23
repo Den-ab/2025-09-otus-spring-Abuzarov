@@ -1,3 +1,3 @@
 package ru.otus.hw.dto;
 
-public record AuthorDTO(Long id, String fullName) {}
+public record AuthorDTO(String id, String fullName) {}

@@ -1,3 +1,5 @@
 package ru.otus.hw.dto;
 
-public record BookDTO(Long id, String title, AuthorDTO author, GenreDTO genre) {}
+import java.util.List;
+
+public record BookDTO(String id, String title, AuthorDTO author, GenreDTO genre, List<CommentDTO> comments) {}
