@@ -1,14 +1,11 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-  sql:
-    init:
-      mode: always
-      data-locations: data.sql
-      schema-locations: schema.sql
-  jpa:
-    hibernate:
-      ddl-auto: none
   shell:
     interactive:
       enabled: false
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: otus_test
+mongock:
+  enabled: false
