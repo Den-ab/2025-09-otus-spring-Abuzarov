@@ -6,8 +6,8 @@ spring:
       database: otus
 
 mongock:
-  migrationScanPackage: ru.otus.hw.migrations
   enabled: true
+  migration-scan-package: ru.otus.hw.migrations
 logging:
   level:
     io.mongock: DEBUG
