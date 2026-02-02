@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import ru.otus.hw.converters.AuthorConverter;
 import ru.otus.hw.services.AuthorService;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -21,10 +22,10 @@ public class AuthorController {
     @RequestMapping(value = "/authors", method = RequestMethod.GET)
     public String findAllAuthors(Model model) {
 
-        final String stringResponse = authorService.findAll().stream()
+        final List<String> authorsString = authorService.findAll().stream()
             .map(authorConverter::authorToString)
-            .collect(Collectors.joining("," + System.lineSeparator()));
-        model.addAttribute(stringResponse);
+            .collect(Collectors.toList());
+        model.addAttribute("authors", authorsString);
         return "authors";
     }
 }
