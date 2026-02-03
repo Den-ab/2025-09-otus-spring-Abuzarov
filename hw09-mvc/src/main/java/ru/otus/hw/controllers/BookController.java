@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.hw.dto.AuthorDTO;
 import ru.otus.hw.dto.BookDTO;
-import ru.otus.hw.dto.BookRequestDTO;
+import ru.otus.hw.dto.requests.BookRequestDTO;
 import ru.otus.hw.dto.GenreDTO;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
