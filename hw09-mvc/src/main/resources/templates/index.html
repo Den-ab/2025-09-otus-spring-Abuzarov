@@ -7,12 +7,16 @@
         <div style="flex-basis: 200px">Genre</div>
         <div style="flex-grow: 1; flex-basis: 200px">Title</div>
         <div style="flex-basis: 300px">Author</div>
+        <div style="flex-basis: 200px"></div>
     </div>
     <a style="text-decoration: none; color: black" th:each="book : ${books}" th:href="@{/books/{id}(id=${book.id()})}">
-    <div style="display: flex; flex-direction: row; gap: 20px; padding: 10px; background-color: bisque; border-bottom: lightgray 1px solid">
-        <div style="flex-basis: 200px" th:text="${book.genre().name()}"></div>
-        <div style="flex-grow: 1; flex-basis: 200px" th:text="${book.title()}"></div>
-        <div style="flex-basis: 300px" th:text="${book.author().fullName()}"></div>
-    </div>
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 10px; background-color: bisque; border-bottom: lightgray 1px solid">
+            <div style="flex-basis: 200px" th:text="${book.genre().name()}"></div>
+            <div style="flex-grow: 1; flex-basis: 200px" th:text="${book.title()}"></div>
+            <div style="flex-basis: 300px" th:text="${book.author().fullName()}"></div>
+            <form th:action="@{/books/{id}(id=${book.id})}" th:method="delete" style="flex-basis: 200px">
+                <button type="submit" style="width: 80px; height: 30px; background-color: purple; color: white">Delete</button>
+            </form>
+        </div>
     </a>
 </div>

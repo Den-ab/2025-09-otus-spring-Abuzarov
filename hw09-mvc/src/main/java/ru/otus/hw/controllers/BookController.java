@@ -41,7 +41,7 @@ public class BookController {
 
         final List<BookDTO> books = bookService.findAll();
         model.addAttribute("books", books);
-        return "books";
+        return "index";
     }
 
     @GetMapping(value = "/books/{id}")
@@ -65,14 +65,17 @@ public class BookController {
     }
 
     @PostMapping(value = "/books/{id}")
-    public String updateBook(@PathVariable("id") long id, @ModelAttribute BookRequestDTO book) {
+    public String updateBook(@PathVariable("id") long id, @ModelAttribute BookRequestDTO book, Model model) {
         var savedBook = bookService.update(id, book.title(), book.authorId(), book.genreId());
 
-        return "redirect:/books/" + savedBook.id();
+        model.addAttribute("book", savedBook);
+        return "book-update-success";
     }
 
     @DeleteMapping(value = "/books/{id}")
-    public void deleteBook(@PathVariable("id") long id) {
+    public String deleteBook(@PathVariable("id") long id) {
         bookService.deleteById(id);
+
+        return "redirect:/books";
     }
 }
