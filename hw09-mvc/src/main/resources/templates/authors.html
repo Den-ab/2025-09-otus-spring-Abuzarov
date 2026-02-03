@@ -1,2 +1,12 @@
-<div>Here will be authors</div>
-<div th:each="author : ${authors}" th:text="${author}"></div>
+<div style="display: flex; justify-content: flex-start; height: 100px; background-color: purple">
+    <a href="/"><img th:src="@{/static/main_logo.png}" width="100px" height="100px" alt="logo"/></a>
+</div>
+<div style="padding: 40px">
+    <h2>All available authors:</h2>
+    <div style="display: flex; flex-direction: row; gap: 20px; padding: 10px; background-color: bisque; border-bottom: darkgray 1px solid">
+        <div style="flex-grow: 1; flex-basis: 300px">Author</div>
+    </div>
+    <div th:each="author : ${authors}" style="display: flex; flex-direction: row; gap: 20px; padding: 10px; background-color: bisque; border-bottom: lightgray 1px solid">
+        <div style="flex-grow: 1; flex-basis: 300px" th:text="${author.fullName()}"></div>
+    </div>
+</div>
