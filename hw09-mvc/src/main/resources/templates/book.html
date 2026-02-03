@@ -4,6 +4,7 @@
     </div>
     <div style="padding: 20px 40px; align-content: center">
         <h2>Book:</h2>
+        <div style="background-color: lightgray; padding: 10px; font-size: 14px; margin-bottom: 40px;" th:each="comment : ${comments}" th:text="${comment.content}"></div>
         <input type="hidden" th:field="*{id}"/>
         <div style="display: flex; flex-direction: column; gap: 40px; width: 50%">
             <input style="height: 40px; min-width: 200px; width: 100%" th:field="*{title}"/>

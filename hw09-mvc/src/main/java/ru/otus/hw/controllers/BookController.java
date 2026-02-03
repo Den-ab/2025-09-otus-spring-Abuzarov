@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.hw.dto.AuthorDTO;
 import ru.otus.hw.dto.BookDTO;
+import ru.otus.hw.dto.CommentDTO;
 import ru.otus.hw.dto.requests.BookRequestDTO;
 import ru.otus.hw.dto.GenreDTO;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
+import ru.otus.hw.services.CommentService;
 import ru.otus.hw.services.GenreService;
 
 import java.util.List;
@@ -27,6 +29,8 @@ public class BookController {
     private final GenreService genreService;
 
     private final AuthorService authorService;
+
+    private final CommentService commentService;
 
     @GetMapping(value = "")
     public String findAllAuthorsForHomePage(Model model) {
@@ -54,6 +58,8 @@ public class BookController {
         final BookDTO book = bookService.findById(id)
             .orElseThrow(() -> new IllegalStateException(String.format("No book with id %s", id)));
         model.addAttribute("book", book);
+        final List<CommentDTO> comments = commentService.findByBookId(id);
+        model.addAttribute("comments", comments);
         return "book";
     }
 
