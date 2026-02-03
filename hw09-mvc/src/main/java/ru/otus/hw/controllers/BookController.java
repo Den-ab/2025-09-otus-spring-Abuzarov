@@ -1,42 +1,78 @@
 package ru.otus.hw.controllers;
 
 import lombok.RequiredArgsConstructor;
-import ru.otus.hw.converters.BookConverter;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import ru.otus.hw.dto.AuthorDTO;
+import ru.otus.hw.dto.BookDTO;
+import ru.otus.hw.dto.BookRequestDTO;
+import ru.otus.hw.dto.GenreDTO;
+import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
+import ru.otus.hw.services.GenreService;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
-@SuppressWarnings({"SpellCheckingInspection", "unused"})
 @RequiredArgsConstructor
+@Controller
 public class BookController {
 
     private final BookService bookService;
 
-    private final BookConverter bookConverter;
+    private final GenreService genreService;
 
-    public String findAllBooks() {
-        return bookService.findAll().stream()
-                .map(bookConverter::bookToString)
-                .collect(Collectors.joining("," + System.lineSeparator()));
+    private final AuthorService authorService;
+
+    @GetMapping(value = "")
+    public String findAllAuthorsForHomePage(Model model) {
+
+        final List<BookDTO> books = bookService.findAll();
+        model.addAttribute("books", books);
+        return "index";
     }
 
-    public String findBookById(long id) {
-        return bookService.findById(id)
-                .map(bookConverter::bookToString)
-                .orElse("Book with id %d not found".formatted(id));
+    @GetMapping(value = "/books")
+    public String findAllBooks(Model model) {
+
+        final List<BookDTO> books = bookService.findAll();
+        model.addAttribute("books", books);
+        return "books";
     }
 
-    public String insertBook(String title, long authorId, long genreId) {
-        var savedBook = bookService.insert(title, authorId, genreId);
-        return bookConverter.bookToString(savedBook);
+    @GetMapping(value = "/books/{id}")
+    public String findBookById(@PathVariable("id") long id, Model model) {
+
+        final List<AuthorDTO> authors = authorService.findAll();
+        model.addAttribute("authors", authors);
+        final List<GenreDTO> genres = genreService.findAll();
+        model.addAttribute("genres", genres);
+        final BookDTO book = bookService.findById(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("No book with id %s", id)));
+        model.addAttribute("book", book);
+        return "book";
     }
 
-    public String updateBook(long id, String title, long authorId, long genreId) {
-        var savedBook = bookService.update(id, title, authorId, genreId);
-        return bookConverter.bookToString(savedBook);
+    @PostMapping(value = "/books")
+    public String insertBook(@ModelAttribute BookRequestDTO book) {
+        var savedBook = bookService.insert(book.title(), book.authorId(), book.genreId());
+
+        return "redirect:/books/" + savedBook.id();
     }
 
-    public void deleteBook(long id) {
+    @PostMapping(value = "/books/{id}")
+    public String updateBook(@PathVariable("id") long id, @ModelAttribute BookRequestDTO book) {
+        var savedBook = bookService.update(id, book.title(), book.authorId(), book.genreId());
+
+        return "redirect:/books/" + savedBook.id();
+    }
+
+    @DeleteMapping(value = "/books/{id}")
+    public void deleteBook(@PathVariable("id") long id) {
         bookService.deleteById(id);
     }
 }
