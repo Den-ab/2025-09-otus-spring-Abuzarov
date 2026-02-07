@@ -90,7 +90,7 @@ public class BookControllerTest {
 
         this.mockMvc.perform(get("/books/1"))
             .andExpect(status().isOk())
-            .andExpect(view().name("book"))
+            .andExpect(view().name("update-book"))
             .andExpect(model().attributeExists("book"))
             .andExpect(model().attribute("book", this.exampleBook));
     }
@@ -112,8 +112,10 @@ public class BookControllerTest {
                 .param("authorId", String.valueOf(author.id()))
                 .param("genreId", String.valueOf(genre.id()))
         )
-            .andExpect(status().is3xxRedirection())
-            .andExpect(view().name("redirect:/books/" + savedBook.id()));
+            .andExpect(status().isOk())
+            .andExpect(view().name("book-save-success"))
+            .andExpect(model().attributeExists("book"))
+            .andExpect(model().attribute("book", savedBook));
     }
 
     @Test
@@ -134,7 +136,7 @@ public class BookControllerTest {
                     .param("genreId", String.valueOf(genre.id()))
             )
             .andExpect(status().isOk())
-            .andExpect(view().name("book-update-success"))
+            .andExpect(view().name("book-save-success"))
             .andExpect(model().attributeExists("book"))
             .andExpect(model().attribute("book", updatedBook));
     }

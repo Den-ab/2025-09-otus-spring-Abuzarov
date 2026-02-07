@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.hw.dto.AuthorDTO;
 import ru.otus.hw.dto.BookDTO;
 import ru.otus.hw.dto.CommentDTO;
-import ru.otus.hw.dto.requests.BookRequestDTO;
+import ru.otus.hw.dto.requests.BookCreateRequestDTO;
+import ru.otus.hw.dto.requests.BookUpdateRequestDTO;
 import ru.otus.hw.dto.GenreDTO;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
@@ -19,6 +20,7 @@ import ru.otus.hw.services.CommentService;
 import ru.otus.hw.services.GenreService;
 
 import java.util.List;
+import java.util.Locale;
 
 @RequiredArgsConstructor
 @Controller
@@ -49,33 +51,44 @@ public class BookController {
     }
 
     @GetMapping(value = "/books/{id}")
-    public String findBookById(@PathVariable("id") long id, Model model) {
+    public String findBookById(@PathVariable("id") String id, Model model) {
 
         final List<AuthorDTO> authors = authorService.findAll();
         model.addAttribute("authors", authors);
         final List<GenreDTO> genres = genreService.findAll();
         model.addAttribute("genres", genres);
-        final BookDTO book = bookService.findById(id)
-            .orElseThrow(() -> new IllegalStateException(String.format("No book with id %s", id)));
-        model.addAttribute("book", book);
-        final List<CommentDTO> comments = commentService.findByBookId(id);
-        model.addAttribute("comments", comments);
-        return "book";
+
+        if (!id.toLowerCase(Locale.ROOT).equals("new")) {
+
+            final long parsedId = Long.parseLong(id);
+
+            final BookDTO book = bookService.findById(parsedId)
+                .orElseThrow(() -> new IllegalStateException(String.format("No book with id %s", parsedId)));
+            model.addAttribute("book", book);
+            final List<CommentDTO> comments = commentService.findByBookId(parsedId);
+            model.addAttribute("comments", comments);
+
+            return "update-book";
+        }
+
+        return "create-book";
     }
 
     @PostMapping(value = "/books")
-    public String insertBook(@ModelAttribute BookRequestDTO book) {
+    public String insertBook(@ModelAttribute BookCreateRequestDTO book, Model model) {
         var savedBook = bookService.insert(book.title(), book.authorId(), book.genreId());
 
-        return "redirect:/books/" + savedBook.id();
+        model.addAttribute("book", savedBook);
+
+        return "book-save-success";
     }
 
     @PostMapping(value = "/books/{id}")
-    public String updateBook(@PathVariable("id") long id, @ModelAttribute BookRequestDTO book, Model model) {
+    public String updateBook(@PathVariable("id") long id, @ModelAttribute BookUpdateRequestDTO book, Model model) {
         var savedBook = bookService.update(id, book.title(), book.authorId(), book.genreId());
 
         model.addAttribute("book", savedBook);
-        return "book-update-success";
+        return "book-save-success";
     }
 
     @DeleteMapping(value = "/books/{id}")
