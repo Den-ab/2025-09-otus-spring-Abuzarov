@@ -1,0 +1,12 @@
+<div style="display: flex; justify-content: flex-start; height: 100px; background-color: purple" title="Go to the books page">
+    <a href="/"><img th:src="@{/static/main_logo.png}" width="100px" height="100px" alt="logo"/></a>
+</div>
+<div style="padding: 20px 40px">
+    <h2>All available genres:</h2>
+    <div style="display: flex; flex-direction: row; gap: 20px; padding: 10px; background-color: bisque; border-bottom: darkgray 1px solid">
+        <div style="flex-grow: 1; flex-basis: 300px">Genre</div>
+    </div>
+    <div th:each="genre : ${genres}" style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 10px; background-color: bisque; border-bottom: lightgray 1px solid">
+        <div style="flex-grow: 1; flex-basis: 300px" th:text="${genre.name()}"></div>
+    </div>
+</div>
