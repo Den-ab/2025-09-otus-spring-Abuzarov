@@ -1,6 +1,7 @@
 package ru.otus.hw.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +18,9 @@ public class GenreController {
     private final GenreService genreService;
 
     @RequestMapping(value = "/genres", method = RequestMethod.GET)
-    public String findAllGenres(Model model) {
+    public ResponseEntity<List<GenreDTO>> findAllGenres(Model model) {
 
         final List<GenreDTO> genres = genreService.findAll();
-        model.addAttribute("genres", genres);
-        return "genres";
+        return ResponseEntity.ok(genres);
     }
 }
