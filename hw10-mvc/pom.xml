@@ -10,9 +10,9 @@
     </parent>
 
     <groupId>ru.otus.hw</groupId>
-    <artifactId>hw09</artifactId>
+    <artifactId>hw10</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-mvc</name>
+    <name>spring-rest</name>
 
     <properties>
         <java.version>17</java.version>
