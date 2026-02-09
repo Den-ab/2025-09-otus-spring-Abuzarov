@@ -48,7 +48,7 @@ async function loadGenres() {
     setStatus("Loading...");
     try {
         // ожидаем: GET /api/genres -> [{name:"..."}]
-        const raw = await api("/api/genres");
+        const raw = await api("/api/genre");
         const genres = (raw || []).map(normalizeGenre);
 
         container.innerHTML = genres.map(renderRow).join("");

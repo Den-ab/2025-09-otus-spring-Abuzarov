@@ -99,7 +99,7 @@ async function loadPage() {
     setStatus("Loading...");
     try {
         // 1) грузим книгу
-        const bookRaw = await api(`/api/books/${encodeURIComponent(id)}`);
+        const bookRaw = await api(`/api/book/${encodeURIComponent(id)}`);
         const book = normalizeBook(bookRaw);
 
         bookIdEl.value = book.id;
@@ -107,10 +107,10 @@ async function loadPage() {
 
         // 2) параллельно справочники + comments
         const [genresRaw, authorsRaw, commentsRaw] = await Promise.all([
-            api("/api/genres"),
-            api("/api/authors"),
+            api("/api/genre"),
+            api("/api/author"),
             // если такого эндпоинта нет — просто вернёшь [] или уберёшь, но я сделал безопасно:
-            api(`/api/books/${encodeURIComponent(id)}/comments`).catch(() => null)
+            api(`/api/book/${encodeURIComponent(id)}/comments`).catch(() => null)
         ]);
 
         const genres = (genresRaw || []).map(normalizeGenre);
@@ -165,8 +165,8 @@ async function saveChanges() {
     setStatus("Saving...");
 
     try {
-        await api(`/api/books/${encodeURIComponent(id)}`, {
-            method: "PUT", // или PATCH — как у тебя будет
+        await api(`/api/book/${encodeURIComponent(id)}`, {
+            method: "PUT",
             body: JSON.stringify(payload)
         });
 

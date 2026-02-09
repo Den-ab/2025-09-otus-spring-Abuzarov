@@ -38,14 +38,14 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    @GetMapping(value = "/books")
+    @GetMapping(value = "/book")
     public ResponseEntity<List<BookDTO>> findAllBooks() {
 
         final List<BookDTO> books = bookService.findAll();
         return ResponseEntity.ok(books);
     }
 
-    @GetMapping(value = "/books/{id}")
+    @GetMapping(value = "/book/{id}")
     public ResponseEntity<BookDTO> findBookById(@PathVariable("id") String id) {
 
         final long parsedId = Long.parseLong(id);
@@ -55,21 +55,21 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    @PostMapping(value = "/books")
+    @PostMapping(value = "/book")
     public ResponseEntity<BookDTO> insertBook(@ModelAttribute BookCreateRequestDTO book) {
         var savedBook = bookService.insert(book.title(), book.authorId(), book.genreId());
 
         return ResponseEntity.ok(savedBook);
     }
 
-    @PostMapping(value = "/books/{id}")
+    @PostMapping(value = "/book/{id}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable("id") long id, @ModelAttribute BookUpdateRequestDTO book, Model model) {
         var savedBook = bookService.update(id, book.title(), book.authorId(), book.genreId());
 
         return ResponseEntity.ok(savedBook);
     }
 
-    @DeleteMapping(value = "/books/{id}")
+    @DeleteMapping(value = "/book/{id}")
     public void deleteBook(@PathVariable("id") long id) {
 
         bookService.deleteById(id);

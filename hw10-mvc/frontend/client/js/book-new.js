@@ -60,8 +60,8 @@ async function loadDictionaries() {
     setStatus("Loading dictionaries...");
     try {
         const [genresRaw, authorsRaw] = await Promise.all([
-            api("/api/genres"),
-            api("/api/authors")
+            api("/api/genre"),
+            api("/api/author")
         ]);
 
         const genres = (genresRaw || []).map(normalizeGenre);
@@ -107,9 +107,7 @@ async function createBook() {
     setStatus("Creating...");
 
     try {
-        // ожидаем POST /api/books с JSON
-        // можно возвращать созданную книгу/ID, но это не обязательно
-        const created = await api("/api/books", {
+        const created = await api("/api/book", {
             method: "POST",
             body: JSON.stringify(payload)
         });
@@ -119,7 +117,7 @@ async function createBook() {
         // вариант 1: если вернулся объект с id — можем открыть детальную страницу
         const id = created?.id ?? created?.id?.();
         if (id) {
-            window.location.href = `/books/${encodeURIComponent(id)}`;
+            window.location.href = `/book/${encodeURIComponent(id)}`;
         } else {
             // вариант 2: просто домой, как раньше после сабмита
             window.location.href = `/`;

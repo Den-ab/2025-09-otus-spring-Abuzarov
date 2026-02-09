@@ -49,7 +49,7 @@ async function loadAuthors() {
     setStatus("Loading...");
     try {
         // ожидаем: GET /api/authors -> [{fullName: "..."}]
-        const raw = await api("/api/authors");
+        const raw = await api("/api/author");
         const authors = (raw || []).map(normalizeAuthor);
 
         container.innerHTML = authors.map(renderRow).join("");
