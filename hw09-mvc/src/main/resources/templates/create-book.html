@@ -1,0 +1,34 @@
+<form th:action="@{/books}" method="post" style="padding: 20px 40px">
+    <div style="display: flex; justify-content: flex-start; height: 100px; background-color: purple" title="Go to the books page">
+        <a href="/"><img th:src="@{/static/main_logo.png}" width="100px" height="100px" alt="logo"/></a>
+    </div>
+    <div style="padding: 20px 40px; align-content: center">
+        <h2>Create book:</h2>
+        <div style="display: flex; flex-direction: column; gap: 40px; width: 50%">
+            <input style="height: 40px; min-width: 200px; width: 100%" name="title" placeholder="Input title"/>
+            <select name="genreId" style="height: 40px; min-width: 200px; width: 100%">
+                <option
+                    style="height: 40px; width: 100%"
+                    th:each="genre : ${genres}"
+                    th:value="${genre.id}"
+                    th:text="${genre.name}"
+                >
+                    Genre
+                </option>
+            </select>
+            <select name="authorId" style="height: 40px; min-width: 200px; width: 100%">
+                <option
+                    style="height: 40px; width: 100%"
+                    th:each="author : ${authors}"
+                    th:value="${author.id}"
+                    th:text="${author.fullName}"
+                >
+                    Author
+                </option>
+            </select>
+            <div style="display: flex; justify-content: center; margin-top: 200px">
+                <button style="cursor: pointer; width: 100px; height: 40px; background-color: purple; color: white">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
