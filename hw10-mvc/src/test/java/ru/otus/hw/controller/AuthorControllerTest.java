@@ -1,5 +1,6 @@
 package ru.otus.hw.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,8 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(AuthorController.class)
 public class AuthorControllerTest {
@@ -24,22 +24,23 @@ public class AuthorControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockitoBean
     private AuthorService authorService;
 
     @Test
     @DisplayName("Проверка получения авторов")
-    void shouldReturnAuthorsViewWIthData() throws Exception {
+    void shouldReturnAuthors() throws Exception {
 
         AuthorDTO author = new AuthorDTO(1L, "Author_1");
         List<AuthorDTO> authors = List.of(author);
 
         when(this.authorService.findAll()).thenReturn(authors);
 
-        this.mockMvc.perform(get("/authors"))
+        this.mockMvc.perform(get("/author"))
             .andExpect(status().isOk())
-            .andExpect(view().name("authors"))
-            .andExpect(model().attributeExists("authors"))
-            .andExpect(model().attribute("authors", authors));
+            .andExpect(content().json(objectMapper.writeValueAsString(authors)));
     }
 }
