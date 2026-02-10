@@ -2,12 +2,12 @@ package ru.otus.hw.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.otus.hw.dto.BookDTO;
 import ru.otus.hw.dto.requests.BookCreateRequestDTO;
@@ -56,14 +56,17 @@ public class BookController {
     }
 
     @PostMapping(value = "/book")
-    public ResponseEntity<BookDTO> insertBook(@ModelAttribute BookCreateRequestDTO book) {
+    public ResponseEntity<BookDTO> insertBook(@RequestBody BookCreateRequestDTO book) {
         var savedBook = bookService.insert(book.title(), book.authorId(), book.genreId());
 
         return ResponseEntity.ok(savedBook);
     }
 
-    @PostMapping(value = "/book/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable("id") long id, @ModelAttribute BookUpdateRequestDTO book, Model model) {
+    @PutMapping(value = "/book/{id}")
+    public ResponseEntity<BookDTO> updateBook(
+        @PathVariable("id") long id,
+        @RequestBody BookUpdateRequestDTO book
+    ) {
         var savedBook = bookService.update(id, book.title(), book.authorId(), book.genreId());
 
         return ResponseEntity.ok(savedBook);

@@ -29,12 +29,8 @@ async function api(url, opts = {}) {
     return ct.includes("application/json") ? res.json() : null;
 }
 
-// поддержка разных форматов DTO:
-// { fullName: "..." } или { fullName(): "..." } или { name: "..." }
 function normalizeAuthor(a) {
-    return {
-        fullName: a.fullName ?? a.fullName?.() ?? a.name ?? ""
-    };
+    return { fullName: a.fullName ?? a.fullName?.() ?? a.name ?? "" };
 }
 
 function renderRow(author) {
@@ -48,8 +44,7 @@ function renderRow(author) {
 async function loadAuthors() {
     setStatus("Loading...");
     try {
-        // ожидаем: GET /api/authors -> [{fullName: "..."}]
-        const raw = await api("/api/author");
+        const raw = await api("api/author");
         const authors = (raw || []).map(normalizeAuthor);
 
         container.innerHTML = authors.map(renderRow).join("");

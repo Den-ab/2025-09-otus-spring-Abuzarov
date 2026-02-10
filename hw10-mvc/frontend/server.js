@@ -24,7 +24,6 @@ app.get("/authors", (_, res) => res.sendFile(path.join(clientDir, "authors.html"
 app.get("/genres", (_, res) => res.sendFile(path.join(clientDir, "genres.html")));
 app.get("/books/new", (_, res) => res.sendFile(path.join(clientDir, "book-new.html")));
 app.get("/books/:id", (_, res) => res.sendFile(path.join(clientDir, "book-edit.html")));
-app.get("/books/success", (_, res) => res.sendFile(path.join(clientDir, "book-new-success.html")));
 
 app.listen(3000, () => {
     console.log("Client running: http://localhost:3000");

@@ -33,8 +33,6 @@ async function api(url, opts = {}) {
     return ct.includes("application/json") ? res.json() : null;
 }
 
-// поддержка форматов DTO:
-// genre: {id, name} или record genre.id() / genre.name()
 function normalizeGenre(g) {
     return {
         id: g.id ?? g.id?.(),
@@ -73,7 +71,6 @@ async function loadDictionaries() {
         setStatus("");
     } catch (e) {
         setStatus("Load error: " + e.message);
-        // чтобы было видно, что упали
         genreEl.innerHTML = `<option value="">(failed to load)</option>`;
         authorEl.innerHTML = `<option value="">(failed to load)</option>`;
     }
@@ -107,21 +104,13 @@ async function createBook() {
     setStatus("Creating...");
 
     try {
-        const created = await api("/api/book", {
+        await api("/api/book", {
             method: "POST",
             body: JSON.stringify(payload)
         });
 
         setStatus("");
-
-        // вариант 1: если вернулся объект с id — можем открыть детальную страницу
-        const id = created?.id ?? created?.id?.();
-        if (id) {
-            window.location.href = `/book/${encodeURIComponent(id)}`;
-        } else {
-            // вариант 2: просто домой, как раньше после сабмита
-            window.location.href = `/`;
-        }
+        window.location.href = `/`;
     } catch (e) {
         setStatus("Create error: " + e.message);
     } finally {

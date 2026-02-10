@@ -29,10 +29,11 @@ async function api(url, opts = {}) {
     return ct.includes("application/json") ? res.json() : null;
 }
 
-// поддержка разных DTO:
-// { name: "..." } или { name(): "..." } или просто строка "Fantasy" (если так отдашь)
 function normalizeGenre(g) {
-    if (typeof g === "string") return { name: g };
+    if (typeof g === "string") {
+
+        return { name: g };
+    }
     return { name: g.name ?? g.name?.() ?? "" };
 }
 
@@ -47,8 +48,7 @@ function renderRow(genre) {
 async function loadGenres() {
     setStatus("Loading...");
     try {
-        // ожидаем: GET /api/genres -> [{name:"..."}]
-        const raw = await api("/api/genre");
+        const raw = await api("api/genre");
         const genres = (raw || []).map(normalizeGenre);
 
         container.innerHTML = genres.map(renderRow).join("");

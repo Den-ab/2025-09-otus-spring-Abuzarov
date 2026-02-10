@@ -36,7 +36,6 @@ async function api(url, opts = {}) {
 }
 
 function getBookIdFromUrl() {
-    // ожидаем /books/{id} или /books/{id}/edit
     const parts = window.location.pathname.split("/").filter(Boolean);
     const idx = parts.indexOf("books");
     if (idx === -1 || !parts[idx + 1]) return null;
@@ -51,8 +50,6 @@ function normalizeAuthor(a) {
     return { id: a.id ?? a.id?.(), name: a.fullName ?? a.fullName?.() ?? a.name ?? "" };
 }
 
-// book ожидаем примерно такой:
-// { id, title, genre:{id,name}, author:{id,fullName}, comments:[{content}]? }
 function normalizeBook(b) {
     const id = b.id ?? b.id?.();
     const title = b.title ?? b.title?.() ?? "";
@@ -81,7 +78,6 @@ function renderComments(comments) {
         commentsEl.innerHTML = "";
         return;
     }
-
     commentsEl.innerHTML = comments.map(c => `
     <div style="background-color: lightgray; padding: 10px; font-size: 14px; margin-bottom: 40px;">
       ${escapeHtml(c.content)}
@@ -98,18 +94,15 @@ async function loadPage() {
 
     setStatus("Loading...");
     try {
-        // 1) грузим книгу
         const bookRaw = await api(`/api/book/${encodeURIComponent(id)}`);
         const book = normalizeBook(bookRaw);
 
         bookIdEl.value = book.id;
         titleEl.value = book.title;
 
-        // 2) параллельно справочники + comments
         const [genresRaw, authorsRaw, commentsRaw] = await Promise.all([
             api("/api/genre"),
             api("/api/author"),
-            // если такого эндпоинта нет — просто вернёшь [] или уберёшь, но я сделал безопасно:
             api(`/api/book/${encodeURIComponent(id)}/comments`).catch(() => null)
         ]);
 
@@ -119,10 +112,7 @@ async function loadPage() {
         fillSelect(genreEl, genres, "Select genre", book.genreId);
         fillSelect(authorEl, authors, "Select author", book.authorId);
 
-        // comments: либо отдельным запросом, либо внутри book
-        const comments =
-            (commentsRaw ? commentsRaw : book.comments).map(normalizeComment);
-
+        const comments = (commentsRaw ? commentsRaw : book.comments).map(normalizeComment);
         renderComments(comments);
 
         setStatus("");
@@ -171,11 +161,7 @@ async function saveChanges() {
         });
 
         setStatus("");
-
-        // куда после сохранения:
         window.location.href = "/";
-        // или так, если хочешь остаться на книге:
-        // window.location.href = `/books/${encodeURIComponent(id)}`;
     } catch (e) {
         setStatus("Save error: " + e.message);
     } finally {

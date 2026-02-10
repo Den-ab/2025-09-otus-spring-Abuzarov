@@ -29,9 +29,6 @@ async function api(url, opts = {}) {
     return ct.includes("application/json") ? res.json() : null;
 }
 
-// НОРМ путь под твою модель, судя по thymeleaf:
-// book.genre().name(), book.title(), book.author().fullName()
-// но в REST это может быть genre.name / author.fullName — я поддержал оба варианта
 function normalizeBook(b) {
     const id = b.id ?? b.id?.() ?? "";
     const title = b.title ?? b.title?.() ?? "";
@@ -46,7 +43,6 @@ function normalizeBook(b) {
 function renderRow(book) {
     const id = escapeHtml(book.id);
 
-    // div вместо <a> (иначе delete-button внутри ссылки = боль)
     return `
     <div class="book-row"
          data-id="${id}"
@@ -70,7 +66,6 @@ function renderRow(book) {
 async function loadBooks() {
     setStatus("Loading...");
     try {
-        // ожидаем: GET /api/books -> [{id, title, genre:{name}, author:{fullName}}]
         const raw = await api("/api/book");
         const books = (raw || []).map(normalizeBook);
 
@@ -92,7 +87,6 @@ async function deleteBook(id) {
     }
 }
 
-// Делегирование кликов: строка открывает, кнопка удаляет
 container.addEventListener("click", (e) => {
     const deleteBtn = e.target.closest(".delete-btn");
     const row = e.target.closest(".book-row");
@@ -107,7 +101,6 @@ container.addEventListener("click", (e) => {
         return;
     }
 
-    // переход на страницу книги (пока оставил как было)
     window.location.href = `/books/${encodeURIComponent(id)}`;
 });
 
