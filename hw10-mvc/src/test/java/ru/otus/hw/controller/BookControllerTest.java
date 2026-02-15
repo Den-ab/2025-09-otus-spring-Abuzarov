@@ -54,7 +54,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Проверка получения книг для домашней страницы")
-    void shouldReturnBooksForHomePage() throws Exception {
+    void shouldReturnBooks() throws Exception {
 
         BookDTO book = new BookDTO(1L, "Book_1", new AuthorDTO(1L, "A1"), new GenreDTO(1L, "G1"));
         List<BookDTO> books = List.of(book);
