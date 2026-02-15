@@ -58,8 +58,8 @@ async function loadDictionaries() {
     setStatus("Loading dictionaries...");
     try {
         const [genresRaw, authorsRaw] = await Promise.all([
-            api("/api/genre"),
-            api("/api/author")
+            api("/api/genres"),
+            api("/api/authors")
         ]);
 
         const genres = (genresRaw || []).map(normalizeGenre);
@@ -104,7 +104,7 @@ async function createBook() {
     setStatus("Creating...");
 
     try {
-        await api("/api/book", {
+        await api("/api/books", {
             method: "POST",
             body: JSON.stringify(payload)
         });

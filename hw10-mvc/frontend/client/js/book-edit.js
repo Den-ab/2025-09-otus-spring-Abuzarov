@@ -94,16 +94,16 @@ async function loadPage() {
 
     setStatus("Loading...");
     try {
-        const bookRaw = await api(`/api/book/${encodeURIComponent(id)}`);
+        const bookRaw = await api(`/api/books/${encodeURIComponent(id)}`);
         const book = normalizeBook(bookRaw);
 
         bookIdEl.value = book.id;
         titleEl.value = book.title;
 
         const [genresRaw, authorsRaw, commentsRaw] = await Promise.all([
-            api("/api/genre"),
-            api("/api/author"),
-            api(`/api/book/${encodeURIComponent(id)}/comments`).catch(() => null)
+            api("/api/genres"),
+            api("/api/authors"),
+            api(`/api/books/${encodeURIComponent(id)}/comments`).catch(() => null)
         ]);
 
         const genres = (genresRaw || []).map(normalizeGenre);
@@ -155,7 +155,7 @@ async function saveChanges() {
     setStatus("Saving...");
 
     try {
-        await api(`/api/book/${encodeURIComponent(id)}`, {
+        await api(`/api/books/${encodeURIComponent(id)}`, {
             method: "PUT",
             body: JSON.stringify(payload)
         });

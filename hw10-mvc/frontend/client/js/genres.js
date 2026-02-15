@@ -48,7 +48,7 @@ function renderRow(genre) {
 async function loadGenres() {
     setStatus("Loading...");
     try {
-        const raw = await api("api/genre");
+        const raw = await api("api/genres");
         const genres = (raw || []).map(normalizeGenre);
 
         container.innerHTML = genres.map(renderRow).join("");

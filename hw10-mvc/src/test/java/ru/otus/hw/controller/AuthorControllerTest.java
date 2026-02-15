@@ -39,7 +39,7 @@ public class AuthorControllerTest {
 
         when(this.authorService.findAll()).thenReturn(authors);
 
-        this.mockMvc.perform(get("/author"))
+        this.mockMvc.perform(get("/authors"))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(authors)));
     }

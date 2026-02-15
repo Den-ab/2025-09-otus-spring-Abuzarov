@@ -44,7 +44,7 @@ function renderRow(author) {
 async function loadAuthors() {
     setStatus("Loading...");
     try {
-        const raw = await api("api/author");
+        const raw = await api("api/authors");
         const authors = (raw || []).map(normalizeAuthor);
 
         container.innerHTML = authors.map(renderRow).join("");

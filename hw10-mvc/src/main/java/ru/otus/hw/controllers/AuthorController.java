@@ -17,7 +17,7 @@ public class AuthorController {
 
     private final AuthorService authorService;
 
-    @RequestMapping(value = "/author", method = RequestMethod.GET)
+    @RequestMapping(value = "/authors", method = RequestMethod.GET)
     public ResponseEntity<List<AuthorDTO>> findAllAuthors(Model model) {
 
         final List<AuthorDTO> authors = authorService.findAll();

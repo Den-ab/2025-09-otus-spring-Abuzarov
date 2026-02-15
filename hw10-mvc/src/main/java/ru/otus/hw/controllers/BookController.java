@@ -31,21 +31,14 @@ public class BookController {
 
     private final CommentService commentService;
 
-    @GetMapping(value = "")
-    public ResponseEntity<List<BookDTO>> findAllAuthorsForHomePage() {
-
-        final List<BookDTO> books = bookService.findAll();
-        return ResponseEntity.ok(books);
-    }
-
-    @GetMapping(value = "/book")
+    @GetMapping(value = "/books")
     public ResponseEntity<List<BookDTO>> findAllBooks() {
 
         final List<BookDTO> books = bookService.findAll();
         return ResponseEntity.ok(books);
     }
 
-    @GetMapping(value = "/book/{id}")
+    @GetMapping(value = "/books/{id}")
     public ResponseEntity<BookDTO> findBookById(@PathVariable("id") String id) {
 
         final long parsedId = Long.parseLong(id);
@@ -55,14 +48,14 @@ public class BookController {
         return ResponseEntity.ok(book);
     }
 
-    @PostMapping(value = "/book")
+    @PostMapping(value = "/books")
     public ResponseEntity<BookDTO> insertBook(@RequestBody BookCreateRequestDTO book) {
         var savedBook = bookService.insert(book.title(), book.authorId(), book.genreId());
 
         return ResponseEntity.ok(savedBook);
     }
 
-    @PutMapping(value = "/book/{id}")
+    @PutMapping(value = "/books/{id}")
     public ResponseEntity<BookDTO> updateBook(
         @PathVariable("id") long id,
         @RequestBody BookUpdateRequestDTO book
@@ -72,7 +65,7 @@ public class BookController {
         return ResponseEntity.ok(savedBook);
     }
 
-    @DeleteMapping(value = "/book/{id}")
+    @DeleteMapping(value = "/books/{id}")
     public void deleteBook(@PathVariable("id") long id) {
 
         bookService.deleteById(id);

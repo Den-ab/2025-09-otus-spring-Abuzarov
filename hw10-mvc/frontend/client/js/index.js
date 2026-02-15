@@ -66,7 +66,7 @@ function renderRow(book) {
 async function loadBooks() {
     setStatus("Loading...");
     try {
-        const raw = await api("/api/book");
+        const raw = await api("/api/books");
         const books = (raw || []).map(normalizeBook);
 
         container.innerHTML = books.map(renderRow).join("");
@@ -79,7 +79,7 @@ async function loadBooks() {
 async function deleteBook(id) {
     setStatus("Deleting...");
     try {
-        await api(`/api/book/${encodeURIComponent(id)}`, { method: "DELETE" });
+        await api(`/api/books/${encodeURIComponent(id)}`, { method: "DELETE" });
         await loadBooks();
         setStatus("");
     } catch (e) {

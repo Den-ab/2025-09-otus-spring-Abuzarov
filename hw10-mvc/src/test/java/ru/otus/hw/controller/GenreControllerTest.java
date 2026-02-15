@@ -42,7 +42,7 @@ public class GenreControllerTest {
 
         when(this.genreService.findAll()).thenReturn(genres);
 
-        this.mockMvc.perform(get("/genre"))
+        this.mockMvc.perform(get("/genres"))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(genres)));
     }

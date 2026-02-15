@@ -52,13 +52,6 @@ public class BookControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final BookDTO exampleBook = new BookDTO(
-        1L,
-        "Book_1",
-        new AuthorDTO(1L, "Author_1"),
-        new GenreDTO(1L, "Genre_1")
-    );
-
     @Test
     @DisplayName("Проверка получения книг для домашней страницы")
     void shouldReturnBooksForHomePage() throws Exception {
@@ -67,20 +60,7 @@ public class BookControllerTest {
         List<BookDTO> books = List.of(book);
         when(this.bookService.findAll()).thenReturn(books);
 
-        mockMvc.perform(get("/book"))
-            .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(books)));
-    }
-
-    @Test
-    @DisplayName("Проверка получения книг")
-    void shouldReturnBooks() throws Exception {
-
-        BookDTO book = new BookDTO(1L, "Book_1", new AuthorDTO(1L, "A1"), new GenreDTO(1L, "G1"));
-        List<BookDTO> books = List.of(book);
-        when(this.bookService.findAll()).thenReturn(books);
-
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/books"))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(books)));
     }
@@ -93,7 +73,7 @@ public class BookControllerTest {
 
         when(bookService.findById(1L)).thenReturn(Optional.of(book));
 
-        mockMvc.perform(get("/book/1"))
+        mockMvc.perform(get("/books/1"))
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(book)));
     }
@@ -108,7 +88,7 @@ public class BookControllerTest {
         when(bookService.insert("New Book", 1L, 1L)).thenReturn(savedBook);
 
         mockMvc.perform(
-            post("/book")
+            post("/books")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -126,7 +106,7 @@ public class BookControllerTest {
         when(bookService.update(1L, "Updated Book", 1L, 1L)).thenReturn(updatedBook);
 
         mockMvc.perform(
-            put("/book/1")
+            put("/books/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
         )
@@ -138,7 +118,7 @@ public class BookControllerTest {
     @DisplayName("Проверка удаления книги и редиректить на список")
     void shouldDeleteBook() throws Exception {
 
-        mockMvc.perform(delete("/book/1")).andExpect(status().isOk());
+        mockMvc.perform(delete("/books/1")).andExpect(status().isOk());
 
         verify(bookService).deleteById(1L);
     }
