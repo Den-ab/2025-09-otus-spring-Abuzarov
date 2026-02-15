@@ -39,13 +39,11 @@ public class BookController {
     }
 
     @GetMapping(value = "/books/{id}")
-    public ResponseEntity<BookDTO> findBookById(@PathVariable("id") String id) {
+    public ResponseEntity<BookDTO> findBookById(@PathVariable("id") Long id) {
 
-        final long parsedId = Long.parseLong(id);
-        final BookDTO book = bookService.findById(parsedId)
-            .orElseThrow(() -> new IllegalStateException(String.format("No book with id %s", parsedId)));
-
-        return ResponseEntity.ok(book);
+        return bookService.findById(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping(value = "/books")
