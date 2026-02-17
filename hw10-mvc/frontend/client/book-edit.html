@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Update book</title>
+</head>
+<body>
+
+<form id="editBookForm" style="padding: 20px 40px">
+    <div style="display: flex; justify-content: flex-start; height: 100px; background-color: purple" title="Go to the books page">
+        <a href="/"><img src="/assets/main_logo.png" width="100" height="100" alt="logo"/></a>
+    </div>
+
+    <div style="padding: 20px 40px; align-content: center">
+        <h2>Update Book:</h2>
+
+        <div id="commentsContainer"></div>
+
+        <input type="hidden" id="bookId"/>
+
+        <div style="display: flex; flex-direction: column; gap: 40px; width: 50%">
+            <input id="title"
+                   style="height: 40px; min-width: 200px; width: 100%"
+                   placeholder="Input title"/>
+
+            <select id="genreId" name="genreId" style="height: 40px; min-width: 200px; width: 100%">
+                <option value="">Loading genres...</option>
+            </select>
+
+            <select id="authorId" name="authorId" style="height: 40px; min-width: 200px; width: 100%">
+                <option value="">Loading authors...</option>
+            </select>
+
+            <div id="status" style="color:#6b6b6b;"></div>
+
+            <div style="display: flex; justify-content: center; margin-top: 200px">
+                <button id="saveBtn" type="submit"
+                        style="cursor: pointer; width: 120px; height: 40px; background-color: purple; color: white; border:none;">
+                    Save changes
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="/js/book-edit.js"></script>
+</body>
+</html>
