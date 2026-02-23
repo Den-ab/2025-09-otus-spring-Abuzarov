@@ -5,8 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.otus.hw.configuration.SecurityConfiguration;
 import ru.otus.hw.controllers.BookController;
 import ru.otus.hw.dto.AuthorDTO;
 import ru.otus.hw.dto.BookDTO;
@@ -17,20 +19,20 @@ import ru.otus.hw.services.CommentService;
 import ru.otus.hw.services.GenreService;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(BookController.class)
+@Import(SecurityConfiguration.class)
 public class BookControllerTest {
 
     @Autowired
@@ -62,11 +64,12 @@ public class BookControllerTest {
         when(this.bookService.findAll()).thenReturn(books);
         when(this.bookService.findById(1L)).thenReturn(Optional.of(exampleBook));
     }
+
     @Test
     @DisplayName("Проверка получения книг для домашней страницы")
     void shouldReturnBooksViewDataForHomePage() throws Exception {
 
-        this.mockMvc.perform(get("/books"))
+        this.mockMvc.perform(get("/books").with(user("test.login")))
             .andExpect(status().isOk())
             .andExpect(view().name("index"))
             .andExpect(model().attributeExists("books"))
@@ -77,7 +80,7 @@ public class BookControllerTest {
     @DisplayName("Проверка получения книг")
     void shouldReturnBooksViewData() throws Exception {
 
-        this.mockMvc.perform(get("/"))
+        this.mockMvc.perform(get("/").with(user("test.login")))
             .andExpect(status().isOk())
             .andExpect(view().name("index"))
             .andExpect(model().attributeExists("books"))
@@ -88,7 +91,7 @@ public class BookControllerTest {
     @DisplayName("Проверка получения книги по ее ID")
     void shouldReturnBookById() throws Exception {
 
-        this.mockMvc.perform(get("/books/1"))
+        this.mockMvc.perform(get("/books/1").with(user("test.login")))
             .andExpect(status().isOk())
             .andExpect(view().name("update-book"))
             .andExpect(model().attributeExists("book"))
@@ -106,7 +109,7 @@ public class BookControllerTest {
         when(this.bookService.insert(title, author.id(), genre.id())).thenReturn(savedBook);
 
         this.mockMvc.perform(
-            post("/books")
+            post("/books").with(user("test.login"))
                 .param("id", String.valueOf(savedBook.id()))
                 .param("title", title)
                 .param("authorId", String.valueOf(author.id()))
@@ -129,7 +132,7 @@ public class BookControllerTest {
         when(this.bookService.update(updatedBook.id(), title, author.id(), genre.id())).thenReturn(updatedBook);
 
         this.mockMvc.perform(
-                post("/books/{id}", updatedBook.id())
+                post("/books/{id}", updatedBook.id()).with(user("test.login"))
                     .param("id", String.valueOf(updatedBook.id()))
                     .param("title", title)
                     .param("authorId", String.valueOf(author.id()))
@@ -146,7 +149,7 @@ public class BookControllerTest {
     void shouldDeleteBook() throws Exception {
 
         long bookId = 1L;
-        this.mockMvc.perform(delete("/books/{id}", bookId))
+        this.mockMvc.perform(delete("/books/{id}", bookId).with(user("test.login")))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/books"));
 
