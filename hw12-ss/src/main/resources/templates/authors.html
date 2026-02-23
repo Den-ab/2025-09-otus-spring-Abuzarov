@@ -7,6 +7,6 @@
         <div style="flex-grow: 1; flex-basis: 300px">Author</div>
     </div>
     <div th:each="author : ${authors}" style="display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 10px; background-color: bisque; border-bottom: lightgray 1px solid">
-        <div style="flex-grow: 1; flex-basis: 300px" th:text="${author.fullName()}"></div>
+        <div style="flex-grow: 1; flex-basis: 300px" th:text="${author.fullName}"></div>
     </div>
 </div>
