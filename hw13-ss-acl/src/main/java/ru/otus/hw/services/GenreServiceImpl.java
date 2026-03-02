@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.dto.GenreDTO;
@@ -17,6 +18,7 @@ public class GenreServiceImpl implements GenreService {
     private final GenreConverter genreConverter;
 
     @Override
+    @PostFilter("canRead(filterObject.id(), T(ru.otus.hw.models.Genre))")
     public List<GenreDTO> findAll() {
         return genreRepository.findAll().stream()
             .map(this.genreConverter::convertToDTO)

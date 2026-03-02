@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.CommentConverter;
@@ -26,13 +27,16 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
+    @PreAuthorize("canRead(#id, T(ru.otus.hw.models.Comment))")
     public Optional<CommentDTO> findById(long id) {
         return commentRepository.findById(id).map(this.commentConverter::convertToDTO);
     }
 
     @Transactional
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_USER_EDITOR', 'ROLE_USER_OBSERVER')")
     public List<CommentDTO> findByBookId(long id) {
+
         return commentRepository.findByBookId(id).stream()
             .map(this.commentConverter::convertToDTO)
             .collect(Collectors.toList());
@@ -40,18 +44,21 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_USER_EDITOR', 'ROLE_USER_OBSERVER')")
     public CommentDTO insert(String content, long bookId) {
         return this.commentConverter.convertToDTO(save(null, content, bookId));
     }
 
     @Transactional
     @Override
+    @PreAuthorize("canUpdate(#id, T(ru.otus.hw.models.Comment))")
     public CommentDTO update(long id, String content, long bookId) {
         return this.commentConverter.convertToDTO(save(id, content, bookId));
     }
 
     @Transactional
     @Override
+    @PreAuthorize("canDelete(#id, T(ru.otus.hw.models.Comment))")
     public void deleteById(long id) {
         commentRepository.deleteById(id);
     }
