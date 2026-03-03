@@ -102,6 +102,6 @@ public class AclMethodSecurityExpressionRoot
 
     boolean isGranted(Object targetId, Class<?> targetClass, Object permission) {
 
-        return hasPermission(targetId, targetClass.getCanonicalName(), permission);
+        return hasPermission(targetId, targetClass.getName(), permission);
     }
 }

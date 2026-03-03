@@ -54,9 +54,7 @@ public class AclConfig {
 
     @Bean
     public JdbcMutableAclService aclService() {
-        final JdbcMutableAclService service = new JdbcMutableAclService(dataSource, lookupStrategy(), aclCache());
-        service.setClassIdentityQuery("SELECT SCOPE_IDENTITY()");
-        service.setSidIdentityQuery("SELECT SCOPE_IDENTITY()");
-        return service;
+
+        return new CustomJdbcMutableAclService(dataSource, lookupStrategy(), aclCache());
     }
 }

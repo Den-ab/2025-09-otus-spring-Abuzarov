@@ -1,20 +1,28 @@
 package ru.otus.hw.services;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
-import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AclServiceWrapperServiceImpl implements AclServiceWrapperService {
+
+    private static final List<Permission> ALL_PERMISSIONS = List.of(
+        BasePermission.READ,
+        BasePermission.WRITE,
+        BasePermission.CREATE,
+        BasePermission.DELETE,
+        BasePermission.ADMINISTRATION
+    );
 
     private final MutableAclService mutableAclService;
 
@@ -23,17 +31,21 @@ public class AclServiceWrapperServiceImpl implements AclServiceWrapperService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
-    public void createPermission(Object object, Permission permission) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final Sid owner = new PrincipalSid(authentication);
+    @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_USER_EDITOR')")
+    public void createPermissions(Object object, List<Permission> permissions) {
         ObjectIdentity oid = new ObjectIdentityImpl(object);
-
-        final Sid admin = new GrantedAuthoritySid("ROLE_SUPER_ADMIN");
-
         MutableAcl acl = mutableAclService.createAcl(oid);
-        acl.insertAce(acl.getEntries().size(), permission, owner, true);
-        acl.insertAce(acl.getEntries().size(), permission, admin, true);
+
+        Sid adminSid = new GrantedAuthoritySid("ROLE_SUPER_ADMIN");
+        Sid editorSid = new GrantedAuthoritySid("ROLE_USER_EDITOR");
+
+        for (Permission p : permissions) {
+            acl.insertAce(acl.getEntries().size(), p, editorSid, true);
+        }
+        for (Permission p : ALL_PERMISSIONS) {
+            acl.insertAce(acl.getEntries().size(), p, adminSid, true);
+        }
+
         mutableAclService.updateAcl(acl);
     }
 }
