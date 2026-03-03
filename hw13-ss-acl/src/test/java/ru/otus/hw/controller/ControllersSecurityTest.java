@@ -8,6 +8,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,8 +35,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -68,13 +73,57 @@ public class ControllersSecurityTest {
     );
 
     @BeforeEach
-    void addBooks() {
+    void setUpMocks() {
+        when(bookService.findAll()).thenReturn(List.of(exampleBook));
+        when(bookService.findById(1L)).thenReturn(Optional.of(exampleBook));
+        when(bookService.update(anyLong(), anyString(), anyLong(), anyLong())).thenReturn(exampleBook);
 
-        List<BookDTO> books = List.of(exampleBook);
-        when(this.bookService.findAll()).thenReturn(books);
-        when(this.bookService.findById(1L)).thenReturn(Optional.of(exampleBook));
-        when(this.bookService.insert(anyString(), anyLong(), anyLong())).thenReturn(exampleBook);
-        when(this.bookService.update(anyLong(), anyString(), anyLong(), anyLong())).thenReturn(exampleBook);
+        doAnswer(invocation -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                return null;
+            }
+            boolean admin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_SUPER_ADMIN"));
+            if (!admin) {
+                throw new AccessDeniedException("ACL Denied");
+            }
+            return null;
+        }).when(bookService).deleteById(1L);
+
+        doAnswer(invocation -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                return exampleBook;
+            }
+            boolean hasRight = auth.getAuthorities().stream().anyMatch(a ->
+                a.getAuthority().equals("ROLE_SUPER_ADMIN") || a.getAuthority().equals("ROLE_USER_EDITOR")
+            );
+            if (!hasRight) {
+                throw new AccessDeniedException("Forbidden");
+            }
+            return exampleBook;
+        }).when(bookService).insert(any(), anyLong(), anyLong());
+
+        doAnswer(invocation -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null) {
+                return exampleBook;
+            }
+            boolean canUpdate = auth.getAuthorities().stream().anyMatch(a ->
+                a.getAuthority().equals("ROLE_SUPER_ADMIN") || a.getAuthority().equals("ROLE_USER_EDITOR")
+            );
+            if (!canUpdate) {
+                throw new org.springframework.security.access.AccessDeniedException("Forbidden");
+            }
+            return exampleBook;
+        }).when(bookService).update(anyLong(), anyString(), anyLong(), anyLong());
+
+        when(authorService.findAll()).thenAnswer(invocation -> {
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                throw new AccessDeniedException("Unauthenticated");
+            }
+            return List.of(new AuthorDTO(1L, "Author_1"));
+        });
     }
 
     @DisplayName("Должен вернуть соответствующий статус")
@@ -122,8 +171,15 @@ public class ControllersSecurityTest {
     }
 
     public static Stream<Arguments> getTestData() {
-        var authUser = user("test.login");
-        Map<String, String> bookParams = Map.of(
+        var admin = user("test.admin").roles("SUPER_ADMIN");
+        var editor = user("test.editor").roles("USER_EDITOR");
+        var observer = user("test.observer").roles("USER_OBSERVER");
+        Map<String, String> bookParamsToCreate = Map.of(
+            "title", "Book_2",
+            "authorId", "2",
+            "genreId", "2"
+        );
+        Map<String, String> bookParamsToUpdate = Map.of(
             "id", "2",
             "title", "Book_2",
             "authorId", "2",
@@ -132,17 +188,45 @@ public class ControllersSecurityTest {
 
         return Stream.of(
             Arguments.of("get", "/authors", null, status().is3xxRedirection(), null, Map.of()),
+            Arguments.of("get", "/authors", admin, status().isOk(), "authors", Map.of()),
+            Arguments.of("get", "/authors", editor, status().isOk(), "authors", Map.of()),
+            Arguments.of("get", "/authors", observer, status().isOk(), "authors", Map.of()),
+
             Arguments.of("get", "/genres", null, status().is3xxRedirection(), null, Map.of()),
+            Arguments.of("get", "/genres", admin, status().isOk(), "genres", Map.of()),
+            Arguments.of("get", "/genres", editor, status().isOk(), "genres", Map.of()),
+            Arguments.of("get", "/genres", observer, status().isOk(), "genres", Map.of()),
+
+
             Arguments.of("get", "/books", null, status().is3xxRedirection(), null, Map.of()),
-            Arguments.of("post", "/books", null, status().is3xxRedirection(), null, Map.of()),
-            Arguments.of("get", "/", authUser, status().isOk(), "index", Map.of()),
-            Arguments.of("get", "/authors", authUser, status().isOk(), "authors", Map.of()),
-            Arguments.of("get", "/genres", authUser, status().isOk(), "genres", Map.of()),
-            Arguments.of("get", "/books", authUser, status().isOk(), "index", Map.of()),
-            Arguments.of("get", "/books/1", authUser, status().isOk(), "update-book", Map.of()),
-            Arguments.of("post", "/books", authUser, status().isOk(), "book-save-success", bookParams),
-            Arguments.of("post", "/books/2", authUser, status().isOk(), "book-save-success", bookParams),
-            Arguments.of("delete", "/books/1", authUser, status().is3xxRedirection(), "redirect:/books", Map.of())
+            Arguments.of("get", "/books", admin, status().isOk(), "index", Map.of()),
+            Arguments.of("get", "/books", editor, status().isOk(), "index", Map.of()),
+            Arguments.of("get", "/books", observer, status().isOk(), "index", Map.of()),
+
+            Arguments.of("get", "/", null, status().is3xxRedirection(), null, Map.of()),
+            Arguments.of("get", "/", admin, status().isOk(), "index", Map.of()),
+            Arguments.of("get", "/", editor, status().isOk(), "index", Map.of()),
+            Arguments.of("get", "/", observer, status().isOk(), "index", Map.of()),
+
+            Arguments.of("get", "/books/1", null, status().is3xxRedirection(), null, Map.of()),
+            Arguments.of("get", "/books/1", admin, status().isOk(), "update-book", Map.of()),
+            Arguments.of("get", "/books/1", editor, status().isOk(), "update-book", Map.of()),
+            Arguments.of("get", "/books/1", observer, status().isOk(), "update-book", Map.of()),
+
+            Arguments.of("post", "/books", null, status().is3xxRedirection(), null, bookParamsToCreate),
+            Arguments.of("post", "/books", admin, status().isOk(), "book-save-success", bookParamsToCreate),
+            Arguments.of("post", "/books", editor, status().isOk(), "book-save-success", bookParamsToCreate),
+            Arguments.of("post", "/books", observer, status().is4xxClientError(), null, bookParamsToCreate),
+
+            Arguments.of("post", "/books/2", null, status().is3xxRedirection(), null, bookParamsToUpdate),
+            Arguments.of("post", "/books/2", admin, status().isOk(), "book-save-success", bookParamsToUpdate),
+            Arguments.of("post", "/books/2", editor, status().isOk(), "book-save-success", bookParamsToUpdate),
+            Arguments.of("post", "/books/2", observer, status().is4xxClientError(), null, bookParamsToUpdate),
+
+            Arguments.of("delete", "/books/1", null, status().is3xxRedirection(), null, Map.of()),
+            Arguments.of("delete", "/books/1", admin, status().is3xxRedirection(), "redirect:/books", Map.of()),
+            Arguments.of("delete", "/books/1", editor, status().is4xxClientError(), null, Map.of()),
+            Arguments.of("delete", "/books/1", observer, status().is4xxClientError(), null, Map.of())
         );
     }
 }
