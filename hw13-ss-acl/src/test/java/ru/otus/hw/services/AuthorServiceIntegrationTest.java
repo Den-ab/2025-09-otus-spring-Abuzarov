@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.AuthorDTO;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public class AuthorServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка того что список авторов не пустой.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
+    @Transactional
     void shouldFindAnyAuthor() {
         final List<AuthorDTO> allAuthors = this.authorService.findAll();
         assertThat(allAuthors).isNotEmpty();

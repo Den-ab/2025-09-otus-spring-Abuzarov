@@ -40,7 +40,7 @@ public class GenreControllerTest {
 
         when(this.genreService.findAll()).thenReturn(genres);
 
-        this.mockMvc.perform(get("/genres").with(user("test.login")))
+        this.mockMvc.perform(get("/genres").with(user("test.admin")))
             .andExpect(status().isOk())
             .andExpect(view().name("genres"))
             .andExpect(model().attributeExists("genres"))

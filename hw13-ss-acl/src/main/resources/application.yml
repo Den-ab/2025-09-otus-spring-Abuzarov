@@ -1,6 +1,8 @@
 spring:
   datasource:
+    #url: jdbc:h2:file:~/maindb
     url: jdbc:h2:mem:maindb
+    username: sa
   sql:
     init:
       mode: always

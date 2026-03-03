@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.BookConverter;
@@ -50,10 +51,12 @@ public class BookServiceImpl implements BookService {
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_USER_EDITOR')")
     public BookDTO insert(String title, long authorId, long genreId) {
         final Book savedBook = save(null, title, authorId, genreId);
-        final BookDTO bookDTO = this.bookConverter.convertToDTO(savedBook);
+        this.aclServiceWrapperService.createPermissions(
+            savedBook,
+            List.of(BasePermission.READ, BasePermission.WRITE, BasePermission.CREATE)
+        );
 
-        this.aclServiceWrapperService.createPermission(savedBook, BasePermission.READ);
-        return bookDTO;
+        return this.bookConverter.convertToDTO(savedBook);
     }
 
     @Transactional

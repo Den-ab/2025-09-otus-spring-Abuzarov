@@ -38,6 +38,7 @@ public class AclServiceWrapperServiceImpl implements AclServiceWrapperService {
 
         Sid adminSid = new GrantedAuthoritySid("ROLE_SUPER_ADMIN");
         Sid editorSid = new GrantedAuthoritySid("ROLE_USER_EDITOR");
+        Sid observerSid = new GrantedAuthoritySid("ROLE_USER_OBSERVER");
 
         for (Permission p : permissions) {
             acl.insertAce(acl.getEntries().size(), p, editorSid, true);
@@ -45,6 +46,7 @@ public class AclServiceWrapperServiceImpl implements AclServiceWrapperService {
         for (Permission p : ALL_PERMISSIONS) {
             acl.insertAce(acl.getEntries().size(), p, adminSid, true);
         }
+        acl.insertAce(acl.getEntries().size(), BasePermission.READ, observerSid, true);
 
         mutableAclService.updateAcl(acl);
     }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import ru.otus.hw.dto.BookDTO;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class BookServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка того что список книг не пустой.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldFindAnyBook() {
         final List<BookDTO> allBooks = this.bookService.findAll();
         assertThat(allBooks).isNotEmpty();
@@ -27,6 +29,7 @@ public class BookServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка создания книги.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldCreateBook() {
 
         final BookDTO bookToCreate = this.bookService.insert("Test_book_1", 2, 2);
@@ -39,6 +42,7 @@ public class BookServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка обновления книги.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldUpdateBook() {
 
         final BookDTO bookToCreate = this.bookService.insert("Test_book_1", 2, 2);
@@ -54,6 +58,7 @@ public class BookServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка удаления книги.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldDeleteBook() {
 
         final BookDTO bookToCreate = this.bookService.insert("Test_book_1", 2, 2);
@@ -66,6 +71,7 @@ public class BookServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка на отсутствие ошибок ленивой загрузки.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void doesntThrowLazyInitializationException() {
 
         assertThatCode(() -> this.bookService.findById(1)).doesNotThrowAnyException();

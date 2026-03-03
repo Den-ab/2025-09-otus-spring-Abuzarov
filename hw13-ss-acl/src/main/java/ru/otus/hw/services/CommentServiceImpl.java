@@ -2,6 +2,7 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.CommentConverter;
@@ -25,6 +26,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentConverter commentConverter;
 
+    private final AclServiceWrapperService aclServiceWrapperService;
+
     @Transactional
     @Override
     @PreAuthorize("canRead(#id, T(ru.otus.hw.models.Comment))")
@@ -46,7 +49,13 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @PreAuthorize("hasAnyAuthority('ROLE_SUPER_ADMIN', 'ROLE_USER_EDITOR', 'ROLE_USER_OBSERVER')")
     public CommentDTO insert(String content, long bookId) {
-        return this.commentConverter.convertToDTO(save(null, content, bookId));
+        final Comment savedComment = save(null, content, bookId);
+        final CommentDTO commentDTO = this.commentConverter.convertToDTO(savedComment);
+        this.aclServiceWrapperService.createPermissions(
+            savedComment,
+            List.of(BasePermission.READ, BasePermission.WRITE, BasePermission.CREATE)
+        );
+        return commentDTO;
     }
 
     @Transactional

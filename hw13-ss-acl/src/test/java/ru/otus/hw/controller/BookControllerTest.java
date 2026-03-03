@@ -69,7 +69,7 @@ public class BookControllerTest {
     @DisplayName("Проверка получения книг для домашней страницы")
     void shouldReturnBooksViewDataForHomePage() throws Exception {
 
-        this.mockMvc.perform(get("/books").with(user("test.login")))
+        this.mockMvc.perform(get("/books").with(user("test.admin")))
             .andExpect(status().isOk())
             .andExpect(view().name("index"))
             .andExpect(model().attributeExists("books"))
@@ -80,7 +80,7 @@ public class BookControllerTest {
     @DisplayName("Проверка получения книг")
     void shouldReturnBooksViewData() throws Exception {
 
-        this.mockMvc.perform(get("/").with(user("test.login")))
+        this.mockMvc.perform(get("/").with(user("test.admin")))
             .andExpect(status().isOk())
             .andExpect(view().name("index"))
             .andExpect(model().attributeExists("books"))
@@ -91,7 +91,7 @@ public class BookControllerTest {
     @DisplayName("Проверка получения книги по ее ID")
     void shouldReturnBookById() throws Exception {
 
-        this.mockMvc.perform(get("/books/1").with(user("test.login")))
+        this.mockMvc.perform(get("/books/1").with(user("test.admin")))
             .andExpect(status().isOk())
             .andExpect(view().name("update-book"))
             .andExpect(model().attributeExists("book"))
@@ -109,7 +109,7 @@ public class BookControllerTest {
         when(this.bookService.insert(title, author.id(), genre.id())).thenReturn(savedBook);
 
         this.mockMvc.perform(
-            post("/books").with(user("test.login"))
+            post("/books").with(user("test.admin"))
                 .param("id", String.valueOf(savedBook.id()))
                 .param("title", title)
                 .param("authorId", String.valueOf(author.id()))
@@ -132,7 +132,7 @@ public class BookControllerTest {
         when(this.bookService.update(updatedBook.id(), title, author.id(), genre.id())).thenReturn(updatedBook);
 
         this.mockMvc.perform(
-                post("/books/{id}", updatedBook.id()).with(user("test.login"))
+                post("/books/{id}", updatedBook.id()).with(user("test.admin"))
                     .param("id", String.valueOf(updatedBook.id()))
                     .param("title", title)
                     .param("authorId", String.valueOf(author.id()))
@@ -149,7 +149,7 @@ public class BookControllerTest {
     void shouldDeleteBook() throws Exception {
 
         long bookId = 1L;
-        this.mockMvc.perform(delete("/books/{id}", bookId).with(user("test.login")))
+        this.mockMvc.perform(delete("/books/{id}", bookId).with(user("test.admin")))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/books"));
 

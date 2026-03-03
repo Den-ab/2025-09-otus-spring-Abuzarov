@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import ru.otus.hw.dto.CommentDTO;
 
 import java.util.List;
@@ -20,22 +21,21 @@ public class CommentServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка создания коммента.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldCreateComment() {
-
         final long bookId = 1;
-        final CommentDTO commentToCreate = this.commentService.insert("Test_comment_1", bookId);
-        final Optional<CommentDTO> createdComment = this.commentService.findById(commentToCreate.id());
-        assertThat(createdComment).isNotEmpty();
-        assertThat(createdComment.get().content()).isEqualTo("Test_comment_1");
-        assertThat(createdComment.get().book().id()).isEqualTo(bookId);
-
+        final int prevCommentsCount = this.commentService.findByBookId(bookId).size();
+        final CommentDTO firstComment = this.commentService.insert("Test_comment_1", bookId);
+        assertThat(this.commentService.findById(firstComment.id())).isPresent();
         this.commentService.insert("Test_comment_2", bookId);
         final List<CommentDTO> commentsByBookId = this.commentService.findByBookId(bookId);
-        assertThat(commentsByBookId).hasSize(2);
+        assertThat(commentsByBookId).hasSize(prevCommentsCount + 2);
+        assertThat(commentsByBookId).extracting(CommentDTO::content).contains("Test_comment_1", "Test_comment_2");
     }
 
     @Test
     @DisplayName("Проверка обновления коммента.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldUpdateComment() {
 
         final long bookId = 1;
@@ -51,6 +51,7 @@ public class CommentServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка удаления коммента.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void shouldDeleteComment() {
 
         final long bookId = 1;
@@ -64,6 +65,7 @@ public class CommentServiceIntegrationTest {
 
     @Test
     @DisplayName("Проверка на отсутствие ошибок ленивой загрузки.")
+    @WithMockUser(authorities = "ROLE_SUPER_ADMIN")
     void doesntThrowLazyInitializationException() {
         final long bookId = 1;
         final CommentDTO commentToCreate = this.commentService.insert("Test_comment_1", bookId);

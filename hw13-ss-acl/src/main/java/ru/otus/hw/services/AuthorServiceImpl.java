@@ -10,17 +10,17 @@ import ru.otus.hw.repositories.AuthorRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-    @RequiredArgsConstructor
-    @Service
-    public class AuthorServiceImpl implements AuthorService {
-        private final AuthorRepository authorRepository;
+@RequiredArgsConstructor
+@Service
+public class AuthorServiceImpl implements AuthorService {
+    private final AuthorRepository authorRepository;
 
-        private final AuthorConverter authorConverter;
+    private final AuthorConverter authorConverter;
 
-        @Override
-        @PostFilter("canRead(filterObject.id(), T(ru.otus.hw.models.Author))")
-        public List<AuthorDTO> findAll() {
-            return authorRepository.findAll().stream().map(this.authorConverter::convertToDTO)
-                .collect(Collectors.toList());
-        }
+    @Override
+    @PostFilter("canRead(filterObject.id(), T(ru.otus.hw.models.Author))")
+    public List<AuthorDTO> findAll() {
+        return authorRepository.findAll().stream().map(this.authorConverter::convertToDTO)
+            .collect(Collectors.toList());
     }
+}

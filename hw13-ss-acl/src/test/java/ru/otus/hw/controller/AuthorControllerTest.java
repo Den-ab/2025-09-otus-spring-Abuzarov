@@ -40,7 +40,7 @@ public class AuthorControllerTest {
 
         when(this.authorService.findAll()).thenReturn(authors);
 
-        this.mockMvc.perform(get("/authors").with(user("test.login")))
+        this.mockMvc.perform(get("/authors").with(user("test.admin")))
             .andExpect(status().isOk())
             .andExpect(view().name("authors"))
             .andExpect(model().attributeExists("authors"))
