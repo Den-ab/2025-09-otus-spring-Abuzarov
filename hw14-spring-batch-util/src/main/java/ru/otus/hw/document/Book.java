@@ -24,6 +24,8 @@ public class Book {
     @ToString.Include
     private ObjectId id;
 
+    private Long legacyId;
+
     @ToString.Include
     private String title;
 

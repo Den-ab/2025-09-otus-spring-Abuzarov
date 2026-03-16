@@ -23,6 +23,8 @@ public class Comment {
     @ToString.Include
     private ObjectId id;
 
+    private Long legacyId;
+
     @ToString.Include
     private String content;
 
