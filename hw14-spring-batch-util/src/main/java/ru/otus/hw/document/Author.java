@@ -15,7 +15,5 @@ public class Author {
     @Id
     private ObjectId id;
 
-    private Long legacyId;
-
     private String fullName;
 }

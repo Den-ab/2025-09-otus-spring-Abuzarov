@@ -9,9 +9,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,14 +21,10 @@ public class Book {
     @ToString.Include
     private ObjectId id;
 
-    private Long legacyId;
-
     @ToString.Include
     private String title;
 
     private ObjectId authorId;
 
     private ObjectId genreId;
-
-    private List<ObjectId> comments = new ArrayList<>();
 }

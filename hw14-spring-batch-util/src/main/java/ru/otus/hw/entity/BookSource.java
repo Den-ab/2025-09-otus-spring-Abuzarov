@@ -23,11 +23,11 @@ import lombok.ToString;
 @Table(name = "books")
 @NamedEntityGraph(
     name = "book-with-authors-and-genres-graph",
-    attributeNodes = {@NamedAttributeNode("author"), @NamedAttributeNode("genre")}
+    attributeNodes = {@NamedAttributeNode("authorSource"), @NamedAttributeNode("genreSource")}
 )
 @ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Book {
+public class BookSource {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -39,9 +39,9 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private Author author;
+    private AuthorSource authorSource;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_id")
-    private Genre genre;
+    private GenreSource genreSource;
 }

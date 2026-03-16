@@ -15,7 +15,5 @@ public class Genre {
     @Id
     private ObjectId id;
 
-    private Long legacyId;
-
     private String name;
 }
