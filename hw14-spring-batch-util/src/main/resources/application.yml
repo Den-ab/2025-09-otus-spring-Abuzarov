@@ -9,3 +9,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: otus
+
