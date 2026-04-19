@@ -11,7 +11,7 @@ public class ButterflyService {
 
         System.out.printf("Этап 2: Из куколки весом %.2f кг появляется бабочка.%n", pupa.weight());
 
-        String color = pupa.weight() > 4 ? "Golden" : "Common White";
+        String color = pupa.weight() >= 5 ? "Golden" : "Common White";
 
         return new Butterfly(pupa.name(), color);
     }
