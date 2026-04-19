@@ -9,7 +9,7 @@ public class CaterpillarService {
 
     public Pupa transformToPupa(Caterpillar caterpillar) {
 
-        System.out.printf("Этап 1: Гусеница %s усиленно питается.%n", caterpillar.name());
+        System.out.printf("Этап 1: Гусеница %s усиленно питается.", caterpillar.name());
 
         double weight = caterpillar.appetiteLevel() * 0.5;
 
