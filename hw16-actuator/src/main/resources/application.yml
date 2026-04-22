@@ -18,3 +18,9 @@ management:
     web:
       exposure:
         include: "health, metrics, logfile"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
