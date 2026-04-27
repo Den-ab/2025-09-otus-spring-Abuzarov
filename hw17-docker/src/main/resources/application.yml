@@ -20,3 +20,11 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health
+  metrics:
+    tags:
+      application: ${spring.application.name}
