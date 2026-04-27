@@ -13,11 +13,14 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+logging:
+  file:
+    name: logs/application.log
 management:
   endpoints:
     web:
       exposure:
-        include: "health, metrics, logfile"
+        include: "health,metrics,logfile"
   endpoint:
     health:
       show-details: always
