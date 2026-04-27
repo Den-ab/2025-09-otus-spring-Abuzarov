@@ -33,3 +33,5 @@ HELP.md
 
 spring-shell.log
 package-lock.json
+
+/logs
