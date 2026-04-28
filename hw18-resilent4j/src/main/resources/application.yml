@@ -13,3 +13,10 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+resilience4j:
+  circuitbreaker:
+    instances:
+      dbStorage:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5000
