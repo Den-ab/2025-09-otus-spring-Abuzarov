@@ -1,5 +1,6 @@
 package ru.otus.hw.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,12 +30,14 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
+    @CircuitBreaker(name = "dbStorage", fallbackMethod = "fallbackBook")
     public Optional<BookDTO> findById(long id) {
         return bookRepository.findById(id).map(this.bookConverter::convertToDTO);
     }
 
     @Transactional
     @Override
+    @CircuitBreaker(name = "dbStorage", fallbackMethod = "fallbackAllBooks")
     public List<BookDTO> findAll() {
         return bookRepository.findAll().stream().map(this.bookConverter::convertToDTO).collect(Collectors.toList());
     }
@@ -63,5 +67,13 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(genreId)));
         var book = new Book(id, title, author, genre);
         return bookRepository.save(book);
+    }
+
+    public Optional<BookDTO> fallbackBook(long id, Exception e) {
+        return Optional.of(new BookDTO(id, "Данные временно недоступны", null, null));
+    }
+
+    public List<BookDTO> fallbackAllBooks(Exception e) {
+        return Collections.emptyList();
     }
 }

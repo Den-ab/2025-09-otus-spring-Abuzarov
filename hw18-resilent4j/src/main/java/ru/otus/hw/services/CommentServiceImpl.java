@@ -1,5 +1,6 @@
 package ru.otus.hw.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +27,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
+    @CircuitBreaker(name = "dbStorage", fallbackMethod = "fallbackComment")
     public Optional<CommentDTO> findById(long id) {
         return commentRepository.findById(id).map(this.commentConverter::convertToDTO);
     }
 
     @Transactional
     @Override
+    @CircuitBreaker(name = "dbStorage", fallbackMethod = "fallbackComment")
     public List<CommentDTO> findByBookId(long id) {
         return commentRepository.findByBookId(id).stream()
             .map(this.commentConverter::convertToDTO)
@@ -56,10 +59,15 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(id);
     }
 
+    public Optional<CommentDTO> fallbackComment(long id, Exception e) {
+        return Optional.of(new CommentDTO(id, "Данные временно недоступны", null));
+    }
+
     private Comment save(Long id, String content, long bookId) {
         var book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book with id %d not found".formatted(bookId)));
         var comment = new Comment(id, content, book);
         return commentRepository.save(comment);
     }
+
 }
